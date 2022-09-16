@@ -1,5 +1,5 @@
 import {
-  IconRectangle, IconCircle, IconPencil, IconArrowRight, IconHandFinger, IconLine
+  IconRectangle, IconCircle, IconPencil, IconArrowRight, IconLine, IconPointer,
 } from '@tabler/icons';
 
 const iconSize = 16;
@@ -31,9 +31,9 @@ const shapeIcons = [
     component: 'FreeDrawing',
   },
   {
-    name: 'Grab Item',
-    icon: <IconHandFinger size={iconSize} />,
-    component: 'Grab',
+    name: 'Pointer',
+    icon: <IconPointer size={iconSize} />,
+    component: 'Pointer',
   },
 ];
 

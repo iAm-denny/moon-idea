@@ -11,7 +11,7 @@ import {
   IconUserCircle,
 } from '@tabler/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { useMediaQuery } from '@mantine/hooks';
+import useResponsive from '../../utils/responsive';
 
 const useStyles = createStyles((theme) => ({
   appshellRoot: {
@@ -65,7 +65,7 @@ function ClientNavigation(props) {
   const { children } = props;
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const isSmallSize = useMediaQuery('(max-width: 768px)');
+  const { isSmall } = useResponsive();
   const [selectedPath, setSelectedPath] = useState(pathname);
   const [opened, setOpened] = useState(false);
   const { classes } = useStyles();
@@ -84,14 +84,14 @@ function ClientNavigation(props) {
 
   useEffect(() => {
     setOpened(false);
-  }, [isSmallSize]);
+  }, [isSmall]);
 
   return (
     <AppShell
       className={classes.appshellRoot}
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
-      header={isSmallSize && (
+      header={isSmall && (
         <Header height={70} p="md">
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
             <MediaQuery largerThan="sm" styles={{ display: 'none' }}>
@@ -108,7 +108,7 @@ function ClientNavigation(props) {
       )}
       navbar={(
         // eslint-disable-next-line no-nested-ternary
-        <Navbar width={{ base: isSmallSize ? opened ? '100%' : 0 : 80 }} p="md" hiddenBreakpoint="sm" hidden={!opened}>
+        <Navbar width={{ base: isSmall ? opened ? '100%' : 0 : 80 }} p="md" hiddenbreakpoint="sm" hidden={!opened}>
           <Center>
             Logo
           </Center>

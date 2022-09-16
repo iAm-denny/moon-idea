@@ -4,14 +4,15 @@ import Shape from './Shape';
 class RectangleShape extends Shape {
   constructor(props) {
     super(props);
-    this.name = props.name;
+    this.data = props;
+    this.id = props.id;
     this.x = props.x;
     this.y = props.y;
-    this.id = new Date().getMilliseconds();
     this.width = props.width;
     this.height = props.height;
     this.fill = props.fill;
     this.stroke = props.stroke;
+    this.onClick = props.onClick;
   }
 
   render() {
@@ -26,6 +27,9 @@ class RectangleShape extends Shape {
         key={this.id}
         onClick={(e) => {
           e.cancelBubble = true;
+          if (this.data.newType === 'Pointer') {
+            this.onClick(this.data);
+          }
         }}
       />
     );

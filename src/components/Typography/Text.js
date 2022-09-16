@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Text as TextManTine } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import useResponsive from '../../utils/responsive';
 
 function Text(props) {
   const { children, size = 'md', mobilesize } = props;
-  const isMobile = useMediaQuery('(max-width: 576px)');
+  const { isSmall } = useResponsive();
 
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
-    <TextManTine {...props} size={isMobile ? mobilesize || 'sm' : size}>
+    <TextManTine {...props} size={isSmall ? mobilesize || 'sm' : size}>
       {children}
     </TextManTine>
   );

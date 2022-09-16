@@ -5,23 +5,22 @@ import {
   Navbar,
   Header,
   Aside,
-  Text,
   MediaQuery,
   useMantineTheme,
   Tabs,
   Tooltip,
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { shapeIcons } from './Shapes/UI/shapeIcons';
 import LeftSideBar from './Shapes/UI/LeftSideBar';
+import useResponsive from '../../../utils/responsive';
+import RightSideBar from './Shapes/UI/RightSideBar';
 
 function SideBars(props) {
   const {
-    children, setselectedShapeItem, selectedShapeItem, currentItems, setCurrentItems,
+    children, selectShapeType, changeSelectShapeTypehandle, currentItems, setCurrentItems,
   } = props;
   const theme = useMantineTheme();
-  const isSmallSize = useMediaQuery('(max-width: 768px)');
-
+  const { isSmall } = useResponsive();
   return (
     <AppShell
       styles={{
@@ -31,23 +30,23 @@ function SideBars(props) {
       }}
       navbarOffsetBreakpoint="sm"
       asideOffsetBreakpoint="sm"
-      navbar={!isSmallSize && (
-        <Navbar p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 200 }}>
+      navbar={!isSmall && (
+        <Navbar p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
           <LeftSideBar currentItems={currentItems} setCurrentItems={setCurrentItems} />
         </Navbar>
 
       )}
-      aside={!isSmallSize && (
+      aside={!isSmall && (
         <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-          <Aside p="md" hiddenBreakpoint="sm" width={{ sm: 200, lg: 200 }}>
-            <Text>Application sidebar</Text>
+          <Aside p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
+            <RightSideBar />
           </Aside>
         </MediaQuery>
       )}
-      header={!isSmallSize && (
-        <Header height={40} p="md" hiddenBreakpoint="sm">
+      header={!isSmall && (
+        <Header height={40} p="md" hiddenbreakpoint="sm">
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
-            <Tabs value={selectedShapeItem} onTabChange={(value) => setselectedShapeItem(value)}>
+            <Tabs value={selectShapeType} onTabChange={(value) => changeSelectShapeTypehandle(value)}>
               <Tabs.List>
                 {
                 shapeIcons.map((item) => (
@@ -69,11 +68,11 @@ function SideBars(props) {
 
 SideBars.propTypes = {
   children: PropTypes.element.isRequired,
-  setselectedShapeItem: PropTypes.func.isRequired,
-  selectedShapeItem: PropTypes.string.isRequired,
+  selectShapeType: PropTypes.string.isRequired,
+  changeSelectShapeTypehandle: PropTypes.func.isRequired,
   // eslint-disable-next-line react/forbid-prop-types
   currentItems: PropTypes.arrayOf(object).isRequired,
-  setCurrentItems: PropTypes.func.isRequired
+  setCurrentItems: PropTypes.func.isRequired,
 };
 
 export default SideBars;

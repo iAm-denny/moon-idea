@@ -1,15 +1,15 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Title as TitleMantine } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
+import useResponsive from '../../utils/responsive';
 
 function Title(props) {
   const { children, order = 1, mobileorder } = props;
-  const isMobile = useMediaQuery('(max-width: 576px)');
+  const { isSmall } = useResponsive();
 
   return (
   // eslint-disable-next-line react/jsx-props-no-spreading
-    <TitleMantine {...props} order={isMobile ? mobileorder || 6 : order}>
+    <TitleMantine {...props} order={isSmall ? mobileorder || 6 : order}>
       {children}
     </TitleMantine>
   );

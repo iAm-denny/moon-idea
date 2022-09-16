@@ -4,13 +4,13 @@ import {
   Button,
   Container, MediaQuery,
 } from '@mantine/core';
-import { useMediaQuery } from '@mantine/hooks';
 import { ReactComponent as LighBulbIcon } from '../assets/icons/light_bulb.svg';
 import Text from '../components/Typography/Text';
 import Title from '../components/Typography/Title';
+import useResponsive from '../utils/responsive';
 
 function LandingPage() {
-  const isMobile = useMediaQuery('(max-width: 576px)');
+  const { isSmall } = useResponsive();
   return (
     <Container
       fluid
@@ -35,11 +35,11 @@ function LandingPage() {
           to the Moon
         </Title>
 
-        <Text size="xl" style={{ margin: '20px 0px', width: isMobile ? '100%' : '60%' }} align="center">
+        <Text size="xl" style={{ margin: '20px 0px', width: isSmall ? '100%' : '60%' }} align="center">
           Moon connects everyone in the design process so teams can deliver better products, faster.
         </Text>
 
-        <Button radius="md" size={isMobile ? 'md' : 'lg'}>Get Started</Button>
+        <Button radius="md" size={isSmall ? 'md' : 'lg'}>Get Started</Button>
       </Container>
     </Container>
   );
