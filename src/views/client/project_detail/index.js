@@ -5,19 +5,24 @@ import {
   Stage, Layer,
 } from 'react-konva';
 import { useSelector, useDispatch } from 'react-redux';
-import { addShape } from '../../../redux/features/shapes/shapeSlice';
+import { v4 as uuid } from 'uuid';
+import { addShape, selectShape } from '../../../redux/features/shapes/shapeSlice';
 import SideBars from './SideBars';
 import FreeDrawing from './Shapes/FreeDrawing';
 import ArrowShape from './Shapes/Arrow';
 import CircleShape from './Shapes/Circle';
 import RectangleShape from './Shapes/Rectangle';
 import LineShape from './Shapes/Line';
+import { colors } from '../../../utils/colors';
+import useResponsive from '../../../utils/responsive';
 
 const index = () => {
   const shapeState = useSelector((state) => state.shape);
   const dispatch = useDispatch();
-
-  const [selectedShapeItem, setselectedShapeItem] = useState('RectangleShape');
+  const { fill: defaultColor, stroke: defaultStrokeColor } = colors.shape;
+  const { isSmall } = useResponsive();
+  const [id, setId] = useState(null);
+  const [selectShapeType, setSelectShapeType] = useState('RectangleShape');
   // previuos shapes
   const [drawables, setDrawables] = useState([]);
   // drawing a new shpae
@@ -33,24 +38,34 @@ const index = () => {
     LineShape,
   };
 
-  const defaultColor = '#D9D9D9';
+  useEffect(() => {
+    if (isSmall) {
+      setSelectShapeType('');
+    } else {
+      setSelectShapeType('RectangleShape');
+    }
+  }, [isSmall]);
 
   const getNewDrawableBasedOnType = (data) => new drawableClasses[data.type](data);
 
   const handleMouseDown = (e) => {
-    if (newDrawable.length === 0) {
+    if (newDrawable.length === 0 && selectShapeType !== 'Pointer') {
+      const tempId = uuid();
+      setId(tempId);
       const { x, y } = e.target.getStage().getPointerPosition();
       const width = 0; const height = 0;
-      const name = `${selectedShapeItem} ${shapeItems.length}`;
+      const name = `${selectShapeType} ${shapeItems.length}`;
       const newShape = getNewDrawableBasedOnType(
         {
+          id: tempId,
           x,
           y,
-          type: selectedShapeItem,
+          type: selectShapeType,
           width,
           height,
           name,
           fill: defaultColor,
+          stroke: defaultStrokeColor,
         },
       );
       setNewDrawable([newShape]);
@@ -67,11 +82,11 @@ const index = () => {
     if (newDrawable.length === 1) {
       const shape = newDrawable[0];
       const { x, y } = e.target.getStage().getPointerPosition();
-      if (selectedShapeItem === 'RectangleShape') {
+      if (selectShapeType === 'RectangleShape') {
         const { sx, sy } = getSizeOfShape(shape);
-        const name = `${selectedShapeItem} ${shapeItems.length}`;
-        const rectangle = new drawableClasses[selectedShapeItem]({
-          name, x: sx, y: sy, width: x - sx, height: y - sy, fill: defaultColor,
+        const name = `${selectShapeType} ${shapeItems.length}`;
+        const rectangle = new drawableClasses[selectShapeType]({
+          id, name, x: sx, y: sy, width: x - sx, height: y - sy, fill: defaultColor, stroke: defaultStrokeColor,
         });
         setNewDrawable([rectangle]);
       } else {
@@ -81,15 +96,19 @@ const index = () => {
     }
   };
 
+  const clickShape = (data) => {
+    dispatch(selectShape(data));
+  };
+
   const handleMouseUp = (e) => {
     if (newDrawable.length === 1) {
       const { x, y } = e.target.getStage().getPointerPosition();
       const shape = newDrawable[0];
-      if (selectedShapeItem === 'RectangleShape') {
+      if (selectShapeType === 'RectangleShape') {
         const { sx, sy } = getSizeOfShape(shape);
-        const name = `${selectedShapeItem} ${shapeItems.length}`;
+        const name = `${selectShapeType} ${shapeItems.length}`;
         const rectangle = {
-          name, x: sx, y: sy, type: selectedShapeItem, width: x - sx, height: y - sy, fill: defaultColor, isDone: true,
+          id, name, x: sx, y: sy, type: selectShapeType, width: x - sx, height: y - sy, fill: defaultColor, isDone: true, stroke: defaultStrokeColor, onClick: (data, isClicked) => clickShape(data, isClicked),
         };
         setNewDrawable([]);
         dispatch(addShape(rectangle));
@@ -98,11 +117,13 @@ const index = () => {
         shape.registerMovement(x, y);
         const shapeVal = {
           ...shape.data,
+          id: shape.id,
           endx: shape.endx,
           endy: shape.endy,
           isDone: true,
-          type: selectedShapeItem,
+          type: selectShapeType,
           points: shape.points,
+          onClick: (data, isClicked) => clickShape(data, isClicked),
         };
         dispatch(addShape(shapeVal));
         setNewDrawable([]);
@@ -115,12 +136,13 @@ const index = () => {
     setShapeItems([...shapeState.shapesItem, ...newDrawable]);
   }, [shapeState.shapesItem, newDrawable]);
 
-  // console.log('> ', shapeItems);
-
-  // console.log('shapeItems', shapeItems);
+  const changeSelectShapeTypehandle = (value) => {
+    dispatch(selectShape(null));
+    setSelectShapeType(value);
+  };
 
   return (
-    <SideBars setselectedShapeItem={setselectedShapeItem} selectedShapeItem={selectedShapeItem} currentItems={shapeItems} setCurrentItems={setShapeItems}>
+    <SideBars changeSelectShapeTypehandle={changeSelectShapeTypehandle} selectShapeType={selectShapeType} currentItems={shapeItems} setCurrentItems={setShapeItems}>
       <Stage
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -132,8 +154,8 @@ const index = () => {
           {
             shapeItems.map((item) => {
               if (item?.isDone) {
-                console.log(' dsff ', item);
-                return getNewDrawableBasedOnType(item).render();
+                const updateItem = { ...item, newType: selectShapeType };
+                return getNewDrawableBasedOnType(updateItem).render();
               }
               return item.render();
             })

@@ -4,11 +4,13 @@ import Shape from './Shape';
 class Line extends Shape {
   constructor(props) {
     super(props);
-    this.data = props;
+    this.id = props.id;
     this.points = [props.x, props.y];
     this.endx = props.endx;
     this.endy = props.endy;
-    this.id = new Date().getMilliseconds();
+    this.fill = props.fill;
+    this.stroke = props.stroke;
+    this.onClick = props.onClick;
   }
 
   registerMovement(x, y) {
@@ -18,7 +20,18 @@ class Line extends Shape {
 
   render() {
     const points = [...this.points, this.endx, this.endy];
-    return <LineKnova points={points} fill="black" stroke="black" key={this.id} />;
+    return (
+      <LineKnova
+        points={points}
+        fill={this.fill}
+        stroke={this.stroke}
+        key={this.id}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          this.onClick(this.data);
+        }}
+      />
+    );
   }
 }
 export default Line;

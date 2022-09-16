@@ -4,22 +4,31 @@ import Shape from './Shape';
 class FreeDrawing extends Shape {
   constructor(props) {
     super(props);
+    this.id = props.id;
     this.data = props;
     this.points = [props.x, props.y];
-    // this.endx = props.endx;
-    // this.endy = props.endy;
-    this.id = new Date().getMilliseconds();
+    this.fill = props.fill;
+    this.stroke = props.stroke;
+    this.onClick = props.onClick;
   }
 
   registerMovement(x, y) {
     this.points = [...this.points, x, y];
-    // this.endx = x;
-    // this.endy = y;
   }
 
   render() {
-    // const points = [...this.points, this.endx, this.endy];
-    return <Line points={this.data?.isDone ? this.data.points : this.points} fill="black" stroke="black" key={this.id} />;
+    return (
+      <Line
+        points={this.data?.isDone ? this.data.points : this.points}
+        fill={this.fill}
+        stroke={this.stroke}
+        key={this.id}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          this.onClick(this.data);
+        }}
+      />
+    );
   }
 }
 export default FreeDrawing;

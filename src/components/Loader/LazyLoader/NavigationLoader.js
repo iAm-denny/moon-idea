@@ -18,9 +18,9 @@ function NavigationLoader() {
   if (isLoggedIn) {
     if (isLargerScreen) {
       return (
-        <Navbar width={{ base: 80 }} p="md" hiddenBreakpoint="sm">
+        <Navbar width={{ base: 80 }} p="md" hiddenbreakpoint="sm">
           <Skeleton height={50} radius="sm" width={35} ml={10} />
-          <Box mt={25} alignItems="center">
+          <Box mt={25} alignitems="center">
             <Skeleton height={25} radius="lg" width={25} m={15} />
             <Skeleton height={25} radius="lg" width={25} m={15} />
           </Box>

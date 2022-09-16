@@ -30,7 +30,7 @@ function LeftSideBar({ currentItems, setCurrentItems }) {
     setData(currentItems);
   }, [currentItems]);
 
-  const items = data.map((item) => (
+  const items = data && data.map((item) => (
     <div key={item.id} className={classes.item}>
       <Text size="xs">{item.name}</Text>
     </div>
@@ -44,7 +44,7 @@ function LeftSideBar({ currentItems, setCurrentItems }) {
         delayOnTouchStart={false}
         delay={0}
         // eslint-disable-next-line react/prop-types
-        list={currentItems}
+        list={currentItems.map((x) => ({ ...x, chosen: true }))}
         setList={setCurrentItems}
         dragoverBubble={false}
       >
