@@ -21,6 +21,11 @@ const index = () => {
   const dispatch = useDispatch();
   const { fill: defaultColor, stroke: defaultStrokeColor } = colors.shape;
   const { isSmall } = useResponsive();
+  const [stage, setStage] = useState({
+    scale: 1,
+    x: 0,
+    y: 0,
+  });
   const [id, setId] = useState(null);
   const [selectShapeType, setSelectShapeType] = useState('RectangleShape');
   // previuos shapes
@@ -52,7 +57,7 @@ const index = () => {
     if (newDrawable.length === 0 && selectShapeType !== 'Pointer') {
       const tempId = uuid();
       setId(tempId);
-      const { x, y } = e.target.getStage().getPointerPosition();
+      const { x, y } = e.target.getStage().getRelativePointerPosition();
       const width = 0; const height = 0;
       const name = `${selectShapeType} ${shapeItems.length}`;
       const newShape = getNewDrawableBasedOnType(
@@ -81,7 +86,7 @@ const index = () => {
   const handleMouseMove = (e) => {
     if (newDrawable.length === 1) {
       const shape = newDrawable[0];
-      const { x, y } = e.target.getStage().getPointerPosition();
+      const { x, y } = e.target.getStage().getRelativePointerPosition();
       if (selectShapeType === 'RectangleShape') {
         const { sx, sy } = getSizeOfShape(shape);
         const name = `${selectShapeType} ${shapeItems.length}`;
@@ -102,7 +107,7 @@ const index = () => {
 
   const handleMouseUp = (e) => {
     if (newDrawable.length === 1) {
-      const { x, y } = e.target.getStage().getPointerPosition();
+      const { x, y } = e.target.getStage().getRelativePointerPosition();
       const shape = newDrawable[0];
       if (selectShapeType === 'RectangleShape') {
         const { sx, sy } = getSizeOfShape(shape);
@@ -141,27 +146,54 @@ const index = () => {
     setSelectShapeType(value);
   };
 
+  const handleWheel = (e) => {
+    e.evt.preventDefault();
+    if (e.evt.ctrlKey) {
+      const scaleBy = 1.1;
+      const temStage = e.target.getStage();
+      const oldScale = temStage.scaleX();
+      const mousePointTo = {
+        x: temStage.getRelativePointerPosition().x / oldScale - temStage.x() / oldScale,
+        y: temStage.getRelativePointerPosition().y / oldScale - temStage.y() / oldScale,
+      };
+
+      const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      setStage({
+        scale: newScale,
+        x:
+          -(mousePointTo.x - temStage.getRelativePointerPosition().x / newScale) * newScale,
+        y:
+          -(mousePointTo.y - temStage.getRelativePointerPosition().y / newScale) * newScale,
+      });
+    }
+  };
+
   return (
     <SideBars changeSelectShapeTypehandle={changeSelectShapeTypehandle} selectShapeType={selectShapeType} currentItems={shapeItems} setCurrentItems={setShapeItems}>
       <Stage
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         onMouseMove={handleMouseMove}
-        width={window.innerWidth}
-        height={window.innerHeight}
+        onWheel={handleWheel}
+        scaleX={stage.scale}
+        scaleY={stage.scale}
+        x={stage.x}
+        y={stage.y}
+        width={window.innerWidth * 3}
+        height={window.innerHeight * 3}
       >
         <Layer>
           {
             shapeItems.map((item) => {
-              if (item?.isDone) {
-                const updateItem = { ...item, newType: selectShapeType };
-                return getNewDrawableBasedOnType(updateItem).render();
-              }
-              return item.render();
+              const updateItem = { ...item, newType: selectShapeType, stage };
+              return item?.isDone
+                ? getNewDrawableBasedOnType(updateItem).render()
+                : item.render();
             })
           }
         </Layer>
       </Stage>
+
     </SideBars>
   );
 };
