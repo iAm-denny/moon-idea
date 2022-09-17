@@ -1,34 +1,28 @@
+import React from 'react';
 import { Line } from 'react-konva';
-import Shape from './Shape';
 
-class FreeDrawing extends Shape {
-  constructor(props) {
-    super(props);
-    this.id = props.id;
-    this.data = props;
-    this.points = [props.x, props.y];
-    this.fill = props.fill;
-    this.stroke = props.stroke;
-    this.onClick = props.onClick;
-  }
+function FreeDrawing(props) {
+  const {
+    // eslint-disable-next-line react/prop-types
+    data, onSelectShape,
+  } = props;
 
-  registerMovement(x, y) {
-    this.points = [...this.points, x, y];
-  }
+  const { // eslint-disable-next-line react/prop-types
+    fill, stroke, id, points,
+  } = data;
 
-  render() {
-    return (
-      <Line
-        points={this.data?.isDone ? this.data.points : this.points}
-        fill={this.fill}
-        stroke={this.stroke}
-        key={this.id}
-        onClick={(e) => {
-          e.cancelBubble = true;
-          this.onClick(this.data);
-        }}
-      />
-    );
-  }
+  return (
+    <Line
+      key={id}
+      points={points}
+      fill={fill}
+      stroke={stroke}
+      onClick={(e) => {
+        e.cancelBubble = true;
+        onSelectShape(props);
+      }}
+    />
+  );
 }
+
 export default FreeDrawing;

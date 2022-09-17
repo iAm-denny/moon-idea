@@ -1,7 +1,7 @@
 class Shape {
-  constructor(data) {
-    this.data = data;
+  constructor(props) {
+    this.data = props;
   }
 }
 
-export default Shape;
+export default (Shape);

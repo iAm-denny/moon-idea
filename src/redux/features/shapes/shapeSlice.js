@@ -14,7 +14,9 @@ export const shapeSlice = createSlice({
       state.shapesItem = [...state.shapesItem, action.payload];
     },
     selectShape: (state, action) => {
-      state.selectShapeValue = action.payload;
+      if (action.payload?.data) {
+        state.selectShapeValue = action.payload?.data;
+      }
     },
     changeFillShape: (state, action) => {
       if (action.payload) {

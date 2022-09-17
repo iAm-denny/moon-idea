@@ -3,7 +3,9 @@
 import { useEffect, useState } from 'react';
 import { createStyles, ScrollArea } from '@mantine/core';
 import { ReactSortable } from 'react-sortablejs';
+import { useSelector, useDispatch } from 'react-redux';
 import Text from '../../../../../components/Typography/Text';
+import { selectShape } from '../../../../../redux/features/shapes/shapeSlice';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -12,17 +14,28 @@ const useStyles = createStyles((theme) => ({
     borderBottom: `1px solid ${
       theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.colors.gray[5]
     }`,
-    padding: 3,
+    padding: 5,
     backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.white,
     marginBottom: theme.spacing.sm,
     cursor: 'pointer',
+    svg: {
+      marginRight: 8,
+    },
   },
-
+  active: {
+    background: theme.fn.variant({ variant: 'light', color: theme.other.primaryColorCode }).background,
+    color: theme.white,
+    borderColor: theme.fn.variant({ variant: 'light', color: theme.other.primaryColorCode }).background,
+    borderRadius: 5,
+    padding: 5,
+  },
 }));
 
 // eslint-disable-next-line react/prop-types
 function LeftSideBar({ currentItems, setCurrentItems }) {
-  const { classes } = useStyles();
+  const { selectShapeValue } = useSelector((state) => state.shape);
+  const { classes, cx } = useStyles();
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
 
   useEffect(() => {
@@ -31,8 +44,17 @@ function LeftSideBar({ currentItems, setCurrentItems }) {
   }, [currentItems]);
 
   const items = data && data.map((item) => (
-    <div key={item.id} className={classes.item}>
-      <Text size="xs">{item.name}</Text>
+    <div
+      key={item?.id || Math.random()}
+      className={cx(classes.item, { [classes.active]: item?.id === selectShapeValue?.id })}
+      // className={classes.item}
+      onClick={() => {
+        if (item && item?.id) dispatch(selectShape({ data: item }));
+      }}
+      aria-hidden="true"
+    >
+      {item?.name.icon}
+      <Text size="xs">{item?.name.name}</Text>
     </div>
   ));
 
