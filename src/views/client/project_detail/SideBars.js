@@ -22,28 +22,34 @@ function SideBars(props) {
   const theme = useMantineTheme();
   const { isSmall } = useResponsive();
   return (
-    <AppShell
-      styles={{
-        main: {
-          background: theme.colorScheme === 'dark' ? theme.colors.dark[8] : theme.colors.gray[0],
-        },
-      }}
-      navbarOffsetBreakpoint="sm"
-      asideOffsetBreakpoint="sm"
-      navbar={!isSmall && (
+    <div style={{
+      overflow: 'hidden',
+      height: '100vh',
+    }}
+    >
+
+      <AppShell
+        styles={{
+          main: {
+            background: theme.colors.gray[0],
+          },
+        }}
+        navbarOffsetBreakpoint="sm"
+        asideOffsetBreakpoint="sm"
+        navbar={!isSmall && (
         <Navbar p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
           <LeftSideBar currentItems={currentItems} setCurrentItems={setCurrentItems} />
         </Navbar>
 
-      )}
-      aside={!isSmall && (
+        )}
+        aside={!isSmall && (
         <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
           <Aside p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
             <RightSideBar />
           </Aside>
         </MediaQuery>
-      )}
-      header={!isSmall && (
+        )}
+        header={!isSmall && (
         <Header height={40} p="md" hiddenbreakpoint="sm">
           <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
             <Tabs value={selectShapeType} onTabChange={(value) => changeSelectShapeTypehandle(value)}>
@@ -59,10 +65,11 @@ function SideBars(props) {
             </Tabs>
           </div>
         </Header>
-      )}
-    >
-      {children}
-    </AppShell>
+        )}
+      >
+        {children}
+      </AppShell>
+    </div>
   );
 }
 
