@@ -17,6 +17,7 @@ module.exports = {
     'react',
   ],
   rules: {
+    'linebreak-style': 0,
     'no-unused-vars': 'warn',
     'comma-dangle': 'warn',
     'max-len': 'warn',

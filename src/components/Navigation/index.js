@@ -3,7 +3,7 @@ import ClientNavigation from './ClientNavigation';
 import DefaultNavigation from './Navigation';
 
 const index = (props) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { children } = props;
 
   if (isLoggedIn && 2 + 1 === 3) {

@@ -12,7 +12,10 @@ import { useForm, yupResolver } from '@mantine/form';
 import {
   IconCircleCheck, IconCircleX, IconX, IconCheck,
 } from '@tabler/icons';
+import { useSelector, useDispatch } from 'react-redux';
 import Modal from '../Modal/Modal';
+import api from '../../config/api';
+import { addUser } from '../../redux/features/user/userSlice';
 
 const HEADER_HEIGHT = 60;
 
@@ -64,7 +67,7 @@ const useStyles = createStyles((theme) => ({
 const registerInputItems = [
   {
     label: 'Full name',
-    name: 'full_name',
+    name: 'fullname',
   },
   {
     label: 'Email',
@@ -100,7 +103,7 @@ function getStrength(password) {
 }
 
 const registerSchema = Yup.object().shape({
-  full_name: Yup.string().min(2, 'Name should have at least 2 letters'),
+  fullname: Yup.string().min(2, 'Name should have at least 2 letters'),
   email: Yup.string().email('Invalid email').required('Required field.'),
   // password: strength !== 100 && "Password doesn't match the requirements.",
   password: Yup.string().required('Required field.').test('pwd-check-strength', 'Password does not meet the requirements.', (value) => getStrength(value) === 100),
@@ -112,12 +115,13 @@ const registerSchema = Yup.object().shape({
 // eslint-disable-next-line react/prop-types
 function RegisterContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [popoverOpened, setPopoverOpened] = useState(false);
   const formRegister = useForm({
     validate: yupResolver(registerSchema),
     validateInputOnChange: true,
     initialValues: {
-      full_name: '',
+      fullname: '',
       email: '',
       password: '',
       confirm_password: '',
@@ -154,8 +158,38 @@ function RegisterContent({ setSwitchForm }) {
   const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
   //  End measure Password legnth *******
 
+  const registerUser = (values) => {
+    api.post('/user/register/', JSON.stringify(values)).then((res) => {
+      if (res?.message?.code === 11000) setErrorMessage('Email already existed.');
+      setErrorMessage(null);
+    }).catch((err) => console.log('err', err));
+  };
+
   return (
-    <form onSubmit={formRegister.onSubmit((values) => console.log(values))} autoComplete="chrome-off">
+    <form
+      onSubmit={formRegister.onSubmit(registerUser)}
+      autoComplete="chrome-off"
+    >
+      {
+        errorMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.red[0],
+              color: theme.colors.red,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.red[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">{errorMessage}</Text>
+          </Box>
+        )
+      }
+
+      <Space h="md" />
       {
         registerInputItems.map((item) => (
           <div key={item.name}>
@@ -196,7 +230,7 @@ function RegisterContent({ setSwitchForm }) {
                   label={item.label}
                   size="sm"
                   withAsterisk
-                  ref={item.name === 'full_name' ? focusFirstInput : null}
+                  ref={item.name === 'fullname' ? focusFirstInput : null}
                   autoComplete="new-password"
                   rightSection={item.name === 'email'
                     ? formRegister.values.email === '' ? <IconCircleCheck color="grey" size={18} /> : formRegister.errors?.email ? <IconCircleX color="red" size={18} />
@@ -229,6 +263,9 @@ const loginSchema = Yup.object().shape({
 // eslint-disable-next-line react/prop-types
 function LoginContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
+  const userState = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState(null);
   const formLogin = useForm({
     validate: yupResolver(loginSchema),
     validateInputOnChange: true,
@@ -242,8 +279,42 @@ function LoginContent({ setSwitchForm }) {
     focusFirstInput.current?.focus();
   }, []);
 
+  const loginUser = (values) => {
+    api.post('/user/login/', JSON.stringify(values)).then((res) => {
+      dispatch(addUser(res));
+      if (!res.success) setErrorMessage('You have entered an incorrect email or password. Please note that both fields are case-sensitive');
+      setErrorMessage(null);
+    }).catch((err) => console.log('err', err));
+  };
+
+  const get = () => {
+    api.get('/user/get_user/', {}, { accessToken: userState.accessToken, rftoken_id: userState.rftoken_id }).then((res) => {
+      console.log('res', res);
+    }).catch((err) => {
+      console.log('err', err);
+    });
+  };
   return (
-    <form onSubmit={formLogin.onSubmit((values) => console.log(values))}>
+    <form onSubmit={formLogin.onSubmit(loginUser)}>
+      {
+        errorMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.red[0],
+              color: theme.colors.red,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.red[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">{errorMessage}</Text>
+          </Box>
+        )
+      }
+      <Space h="md" />
       <TextInput
         label="Email"
         size="sm"
@@ -261,8 +332,9 @@ function LoginContent({ setSwitchForm }) {
       />
       <Space h="md" />
       <Group position="apart" spacing="xs">
+        <Button onClick={get}>get</Button>
         <Text size="sm" color="gray" style={{ cursor: 'pointer' }} onClick={() => setSwitchForm('register_form')}>Don&apos;t have an account? Register</Text>
-        <Button variant="filled" type="submit"> Register</Button>
+        <Button variant="filled" type="submit"> Login</Button>
       </Group>
     </form>
 
