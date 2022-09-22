@@ -1,7 +1,5 @@
 /* eslint-disable no-nested-ternary */
 /* eslint-disable no-unused-expressions */
-import { useDispatch } from 'react-redux';
-import { changeAccessToken } from '../redux/features/user/userSlice';
 import config from './urls';
 
 const objectToQueryString = (obj) => Object.keys(obj)
@@ -9,7 +7,6 @@ const objectToQueryString = (obj) => Object.keys(obj)
   .join('&');
 
 const doRequest = (path, params, method, token) => {
-  const dispatch = useDispatch();
   const options = { method, headers: {} };
   // convert the object to params
   params
@@ -37,10 +34,7 @@ const doRequest = (path, params, method, token) => {
     if (response.status === 204) {
       return undefined;
     }
-    return response.json().then((result) => {
-      dispatch(changeAccessToken(result.accessToken));
-      return result;
-    });
+    return response.json().then((result) => result);
   });
 };
 

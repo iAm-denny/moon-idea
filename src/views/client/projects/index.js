@@ -117,7 +117,7 @@ function Index(props) {
             >
               {
                 chipItems.map((item) => (
-                  <Chip classNames={classes} value={item.value}>{item.name}</Chip>
+                  <Chip classNames={classes} value={item.value} key={item.value}>{item.name}</Chip>
                 ))
               }
 

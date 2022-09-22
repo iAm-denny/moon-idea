@@ -6,6 +6,11 @@ const useStyles = createStyles((theme) => ({
   root: {
     '.mantine-Modal-modal': {
       border: `2px solid ${theme.other.primaryColorCode}`,
+      '.mantine-Modal-close ': {
+        position: 'absolute',
+        top: 10,
+        right: 5,
+      },
     },
     '.mantine-Modal-title': {
       color: theme.other.primaryColorCode,

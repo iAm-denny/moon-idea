@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  createStyles, Header, Container, Group, Burger, Paper, Transition, Text, Button, TextInput, Space, PasswordInput, Popover, Box, Progress,
+  createStyles, Header, Container, Group, Burger, Paper, Transition, Text, Button, TextInput, Space, PasswordInput, Popover, Box, Progress, LoadingOverlay,
 } from '@mantine/core';
 import * as Yup from 'yup';
 import { useDisclosure } from '@mantine/hooks';
@@ -12,7 +12,7 @@ import { useForm, yupResolver } from '@mantine/form';
 import {
   IconCircleCheck, IconCircleX, IconX, IconCheck,
 } from '@tabler/icons';
-import { useSelector, useDispatch } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import Modal from '../Modal/Modal';
 import api from '../../config/api';
 import { addUser } from '../../redux/features/user/userSlice';
@@ -22,7 +22,7 @@ const HEADER_HEIGHT = 60;
 const useStyles = createStyles((theme) => ({
   root: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
 
   navItemsMobile: {
@@ -30,7 +30,7 @@ const useStyles = createStyles((theme) => ({
     top: HEADER_HEIGHT,
     left: 0,
     right: 0,
-    zIndex: 0,
+    zIndex: 1,
     borderTopRightRadius: 0,
     borderTopLeftRadius: 0,
     borderTopWidth: 0,
@@ -38,6 +38,7 @@ const useStyles = createStyles((theme) => ({
     textAlign: 'center',
     paddingTop: 16,
     paddingBottom: 16,
+    background: '#fff',
     [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
@@ -117,6 +118,8 @@ function RegisterContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
   const [errorMessage, setErrorMessage] = useState(null);
   const [popoverOpened, setPopoverOpened] = useState(false);
+  const dispatch = useDispatch();
+  const [loader, setLoader] = useState(false);
   const formRegister = useForm({
     validate: yupResolver(registerSchema),
     validateInputOnChange: true,
@@ -159,10 +162,20 @@ function RegisterContent({ setSwitchForm }) {
   //  End measure Password legnth *******
 
   const registerUser = (values) => {
+    setLoader(true);
     api.post('/user/register/', JSON.stringify(values)).then((res) => {
+      setLoader(false);
       if (res?.message?.code === 11000) setErrorMessage('Email already existed.');
-      setErrorMessage(null);
-    }).catch((err) => console.log('err', err));
+      else {
+        dispatch(addUser(res));
+        localStorage.setItem('rftoken_id', res.rftoken_id);
+        setErrorMessage(null);
+      }
+    }).catch((err) => {
+      if (err?.message?.code === 11000) setErrorMessage('Email already existed.');
+      setLoader(false);
+      setErrorMessage('Something went wrong');
+    });
   };
 
   return (
@@ -246,7 +259,11 @@ function RegisterContent({ setSwitchForm }) {
       }
       <Group position="apart" spacing="xs">
         <Text size="sm" color="gray" style={{ cursor: 'pointer' }} onClick={() => setSwitchForm('login_form')}>Have an account? Login</Text>
-        <Button variant="filled" type="submit"> Register</Button>
+        <Button variant="filled" type="submit">
+          {
+            loader ? <LoadingOverlay visible overlayBlur={2} loaderProps={{ size: 'xs' }} /> : 'Register'
+          }
+        </Button>
       </Group>
     </form>
 
@@ -263,7 +280,7 @@ const loginSchema = Yup.object().shape({
 // eslint-disable-next-line react/prop-types
 function LoginContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
-  const userState = useSelector((state) => state.user.user);
+  const [loader, setLoader] = useState(false);
   const dispatch = useDispatch();
   const [errorMessage, setErrorMessage] = useState(null);
   const formLogin = useForm({
@@ -280,20 +297,19 @@ function LoginContent({ setSwitchForm }) {
   }, []);
 
   const loginUser = (values) => {
+    setLoader(true);
     api.post('/user/login/', JSON.stringify(values)).then((res) => {
+      localStorage.setItem('rftoken_id', res.rftoken_id);
       dispatch(addUser(res));
+      setLoader(false);
       if (!res.success) setErrorMessage('You have entered an incorrect email or password. Please note that both fields are case-sensitive');
       setErrorMessage(null);
-    }).catch((err) => console.log('err', err));
-  };
-
-  const get = () => {
-    api.get('/user/get_user/', {}, { accessToken: userState.accessToken, rftoken_id: userState.rftoken_id }).then((res) => {
-      console.log('res', res);
-    }).catch((err) => {
-      console.log('err', err);
+    }).catch(() => {
+      setErrorMessage('Something went wring.');
+      setLoader(false);
     });
   };
+
   return (
     <form onSubmit={formLogin.onSubmit(loginUser)}>
       {
@@ -326,15 +342,19 @@ function LoginContent({ setSwitchForm }) {
 
       <Space h="md" />
       <PasswordInput
-        label="Confirm password"
-                  // eslint-disable-next-line react/jsx-props-no-spreading
+        label="Password"
+         // eslint-disable-next-line react/jsx-props-no-spreading
         {...formLogin.getInputProps('password')}
       />
       <Space h="md" />
       <Group position="apart" spacing="xs">
-        <Button onClick={get}>get</Button>
         <Text size="sm" color="gray" style={{ cursor: 'pointer' }} onClick={() => setSwitchForm('register_form')}>Don&apos;t have an account? Register</Text>
-        <Button variant="filled" type="submit"> Login</Button>
+        <Button variant="filled" type="submit">
+          {
+            loader ? <LoadingOverlay visible overlayBlur={2} loaderProps={{ size: 'xs' }} />
+              : 'Login'
+          }
+        </Button>
       </Group>
     </form>
 
