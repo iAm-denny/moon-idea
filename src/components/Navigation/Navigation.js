@@ -4,7 +4,7 @@
 import { useState, useRef, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  createStyles, Header, Container, Group, Burger, Paper, Transition, Text, Button, TextInput, Space, PasswordInput, Popover, Box, Progress,
+  createStyles, Header, Container, Group, Burger, Paper, Transition, Text, Button, TextInput, Space, PasswordInput, Popover, Box, Progress, LoadingOverlay,
 } from '@mantine/core';
 import * as Yup from 'yup';
 import { useDisclosure } from '@mantine/hooks';
@@ -12,14 +12,17 @@ import { useForm, yupResolver } from '@mantine/form';
 import {
   IconCircleCheck, IconCircleX, IconX, IconCheck,
 } from '@tabler/icons';
+import { useDispatch } from 'react-redux';
 import Modal from '../Modal/Modal';
+import api from '../../config/api';
+import { addUser } from '../../redux/features/user/userSlice';
 
 const HEADER_HEIGHT = 60;
 
 const useStyles = createStyles((theme) => ({
   root: {
     position: 'relative',
-    zIndex: 1,
+    zIndex: 2,
   },
 
   navItemsMobile: {
@@ -27,7 +30,7 @@ const useStyles = createStyles((theme) => ({
     top: HEADER_HEIGHT,
     left: 0,
     right: 0,
-    zIndex: 0,
+    zIndex: 1,
     borderTopRightRadius: 0,
     borderTopLeftRadius: 0,
     borderTopWidth: 0,
@@ -35,6 +38,7 @@ const useStyles = createStyles((theme) => ({
     textAlign: 'center',
     paddingTop: 16,
     paddingBottom: 16,
+    background: '#fff',
     [theme.fn.largerThan('sm')]: {
       display: 'none',
     },
@@ -64,7 +68,7 @@ const useStyles = createStyles((theme) => ({
 const registerInputItems = [
   {
     label: 'Full name',
-    name: 'full_name',
+    name: 'fullname',
   },
   {
     label: 'Email',
@@ -100,7 +104,7 @@ function getStrength(password) {
 }
 
 const registerSchema = Yup.object().shape({
-  full_name: Yup.string().min(2, 'Name should have at least 2 letters'),
+  fullname: Yup.string().min(2, 'Name should have at least 2 letters'),
   email: Yup.string().email('Invalid email').required('Required field.'),
   // password: strength !== 100 && "Password doesn't match the requirements.",
   password: Yup.string().required('Required field.').test('pwd-check-strength', 'Password does not meet the requirements.', (value) => getStrength(value) === 100),
@@ -112,12 +116,15 @@ const registerSchema = Yup.object().shape({
 // eslint-disable-next-line react/prop-types
 function RegisterContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
+  const [errorMessage, setErrorMessage] = useState(null);
   const [popoverOpened, setPopoverOpened] = useState(false);
+  const dispatch = useDispatch();
+  const [loader, setLoader] = useState(false);
   const formRegister = useForm({
     validate: yupResolver(registerSchema),
     validateInputOnChange: true,
     initialValues: {
-      full_name: '',
+      fullname: '',
       email: '',
       password: '',
       confirm_password: '',
@@ -154,8 +161,48 @@ function RegisterContent({ setSwitchForm }) {
   const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red';
   //  End measure Password legnth *******
 
+  const registerUser = (values) => {
+    setLoader(true);
+    api.post('/user/register/', JSON.stringify(values)).then((res) => {
+      setLoader(false);
+      if (res?.message?.code === 11000) setErrorMessage('Email already existed.');
+      else {
+        dispatch(addUser(res));
+        localStorage.setItem('rftoken_id', res.rftoken_id);
+        setErrorMessage(null);
+      }
+    }).catch((err) => {
+      if (err?.message?.code === 11000) setErrorMessage('Email already existed.');
+      setLoader(false);
+      setErrorMessage('Something went wrong');
+    });
+  };
+
   return (
-    <form onSubmit={formRegister.onSubmit((values) => console.log(values))} autoComplete="chrome-off">
+    <form
+      onSubmit={formRegister.onSubmit(registerUser)}
+      autoComplete="chrome-off"
+    >
+      {
+        errorMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.red[0],
+              color: theme.colors.red,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.red[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">{errorMessage}</Text>
+          </Box>
+        )
+      }
+
+      <Space h="md" />
       {
         registerInputItems.map((item) => (
           <div key={item.name}>
@@ -196,7 +243,7 @@ function RegisterContent({ setSwitchForm }) {
                   label={item.label}
                   size="sm"
                   withAsterisk
-                  ref={item.name === 'full_name' ? focusFirstInput : null}
+                  ref={item.name === 'fullname' ? focusFirstInput : null}
                   autoComplete="new-password"
                   rightSection={item.name === 'email'
                     ? formRegister.values.email === '' ? <IconCircleCheck color="grey" size={18} /> : formRegister.errors?.email ? <IconCircleX color="red" size={18} />
@@ -212,7 +259,11 @@ function RegisterContent({ setSwitchForm }) {
       }
       <Group position="apart" spacing="xs">
         <Text size="sm" color="gray" style={{ cursor: 'pointer' }} onClick={() => setSwitchForm('login_form')}>Have an account? Login</Text>
-        <Button variant="filled" type="submit"> Register</Button>
+        <Button variant="filled" type="submit">
+          {
+            loader ? <LoadingOverlay visible overlayBlur={2} loaderProps={{ size: 'xs' }} /> : 'Register'
+          }
+        </Button>
       </Group>
     </form>
 
@@ -229,6 +280,9 @@ const loginSchema = Yup.object().shape({
 // eslint-disable-next-line react/prop-types
 function LoginContent({ setSwitchForm }) {
   const focusFirstInput = useRef(null);
+  const [loader, setLoader] = useState(false);
+  const dispatch = useDispatch();
+  const [errorMessage, setErrorMessage] = useState(null);
   const formLogin = useForm({
     validate: yupResolver(loginSchema),
     validateInputOnChange: true,
@@ -242,8 +296,41 @@ function LoginContent({ setSwitchForm }) {
     focusFirstInput.current?.focus();
   }, []);
 
+  const loginUser = (values) => {
+    setLoader(true);
+    api.post('/user/login/', JSON.stringify(values)).then((res) => {
+      localStorage.setItem('rftoken_id', res.rftoken_id);
+      dispatch(addUser(res));
+      setLoader(false);
+      if (!res.success) setErrorMessage('You have entered an incorrect email or password. Please note that both fields are case-sensitive');
+      setErrorMessage(null);
+    }).catch(() => {
+      setErrorMessage('Something went wring.');
+      setLoader(false);
+    });
+  };
+
   return (
-    <form onSubmit={formLogin.onSubmit((values) => console.log(values))}>
+    <form onSubmit={formLogin.onSubmit(loginUser)}>
+      {
+        errorMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.red[0],
+              color: theme.colors.red,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.red[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">{errorMessage}</Text>
+          </Box>
+        )
+      }
+      <Space h="md" />
       <TextInput
         label="Email"
         size="sm"
@@ -255,14 +342,19 @@ function LoginContent({ setSwitchForm }) {
 
       <Space h="md" />
       <PasswordInput
-        label="Confirm password"
-                  // eslint-disable-next-line react/jsx-props-no-spreading
+        label="Password"
+         // eslint-disable-next-line react/jsx-props-no-spreading
         {...formLogin.getInputProps('password')}
       />
       <Space h="md" />
       <Group position="apart" spacing="xs">
         <Text size="sm" color="gray" style={{ cursor: 'pointer' }} onClick={() => setSwitchForm('register_form')}>Don&apos;t have an account? Register</Text>
-        <Button variant="filled" type="submit"> Register</Button>
+        <Button variant="filled" type="submit">
+          {
+            loader ? <LoadingOverlay visible overlayBlur={2} loaderProps={{ size: 'xs' }} />
+              : 'Login'
+          }
+        </Button>
       </Group>
     </form>
 

@@ -9,7 +9,10 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
-    marginTop: 60
+    marginTop: 60,
+    [theme.fn.smallerThan('md')]: {
+      marginTop: 120,
+    },
   },
 
   title: {

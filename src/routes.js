@@ -1,19 +1,20 @@
 import { lazy } from 'react';
+import { useSelector } from 'react-redux';
 
 const LandingPage = lazy(() => import('./views/LandingPage'));
 const ClientProjectsPage = lazy(() => import('./views/client/projects'));
 const ClientProjectsDetailPage = lazy(() => import('./views/client/project_detail'));
 const ClientCommunityPage = lazy(() => import('./views/client/community'));
 
-const routes = [
-  {
+const routeFunction = () => {
+  const userState = useSelector((state) => state.user);
+  const defaultRoutes = [{
     path: '/',
     key: 'LANDING_PAGE',
     exact: true,
     component: LandingPage,
-  },
-  // when logged in
-  {
+  }];
+  const clientRoutes = [{
     path: '/client',
     key: 'CLIENT',
     routes: [
@@ -38,7 +39,9 @@ const routes = [
         component: ClientProjectsDetailPage,
       },
     ],
-  },
-];
+  }];
+  const routes = userState?.user?.accessToken ? clientRoutes : defaultRoutes;
+  return routes;
+};
 
-export default routes;
+export default routeFunction;

@@ -1,12 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useSelector } from 'react-redux';
 import ClientNavigation from './ClientNavigation';
 import DefaultNavigation from './Navigation';
 
 const index = (props) => {
-  const [isLoggedIn, setIsLoggedIn] = useState(true);
+  const userState = useSelector((state) => state.user);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const { children } = props;
 
-  if (isLoggedIn && 2 + 1 === 3) {
+  // when view project detail
+  if (isLoggedIn && 2 + 1 === 4) {
     return (
       <div>
         {children}
@@ -14,7 +17,8 @@ const index = (props) => {
     );
   }
 
-  if (isLoggedIn) {
+  // when logged in
+  if (userState?.user?.accessToken) {
     return (
       <ClientNavigation>
         {children}
