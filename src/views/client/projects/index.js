@@ -128,8 +128,7 @@ function Index(props) {
       <Title order={1}>{title}</Title>
       <Modal opened={openCreateProjectForm} setopened={setOpenCreateProjectForm} title="Create a project">
         <form onSubmit={formCreateProject.onSubmit(createProject)}>
-          {
-        !errorMessage && (
+          {errorMessage && (
           <Box
             sx={(theme) => ({
               backgroundColor: theme.colors.red[0],
@@ -146,8 +145,7 @@ function Index(props) {
               {errorMessage}
             </Text>
           </Box>
-        )
-      }
+          )}
           <TextInput
             label="Project name"
             size="sm"
