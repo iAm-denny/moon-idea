@@ -1,14 +1,20 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
-  Box, createStyles, Button, Group, TextInput, Space, Chip,
+  Box, createStyles, Button, Group, TextInput, Space, Chip, LoadingOverlay, Skeleton,
 } from '@mantine/core';
 import PropTypes from 'prop-types';
-import { IconPlus, IconGripVertical } from '@tabler/icons';
+import {
+  IconPlus, IconBriefcase, IconUser, IconGrain,
+} from '@tabler/icons';
 import * as Yup from 'yup';
 import { useForm, yupResolver } from '@mantine/form';
+import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import Title from '../../../components/Typography/Title';
 import Text from '../../../components/Typography/Text';
 import Modal from '../../../components/Modal/Modal';
+import api from '../../../config/api';
+import { addNewProject, fetchProjectList } from '../../../redux/features/user/clientSlice';
 
 const useStyles = createStyles((theme, _params, getRef) => ({
   item: {
@@ -66,19 +72,26 @@ const chipItems = [
   {
     name: 'Workspace',
     value: 'workspace',
+    icon: <IconBriefcase size={16} />,
   },
   {
     name: 'Personal',
     value: 'personal',
+    icon: <IconUser size={16} />,
   }, {
     name: 'Other',
     value: 'other',
+    icon: <IconGrain size={16} />,
   },
 ];
 
 function Index(props) {
   const { title } = props;
   const { classes, cx } = useStyles();
+  const dispatch = useDispatch();
+  const userState = useSelector((state) => state.user.user);
+  const clientState = useSelector((state) => state.client);
+  const [errorMessage, setErrorMessage] = useState('');
   const [openCreateProjectForm, setOpenCreateProjectForm] = useState(false);
   const focusFirstInput = useRef(null);
 
@@ -91,13 +104,50 @@ function Index(props) {
     },
   });
 
+  useEffect(() => {
+    dispatch(fetchProjectList(userState.accessToken));
+  }, []);
   const handleClickCreateBtn = () => setOpenCreateProjectForm(true);
 
+  const createProject = (values) => {
+    api.post('/client/create-project/', JSON.stringify(values), { accessToken: userState.accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((res) => {
+      if (res?.message === 'success') {
+        setErrorMessage('');
+        dispatch(addNewProject(res.data));
+      }
+      formCreateProject.setValues({
+        project_name: '',
+        project_type: '',
+      });
+      setOpenCreateProjectForm(false);
+    })
+      .catch(() => setErrorMessage('Something went wrong'));
+  };
   return (
     <div>
       <Title order={1}>{title}</Title>
       <Modal opened={openCreateProjectForm} setopened={setOpenCreateProjectForm} title="Create a project">
-        <form onSubmit={formCreateProject.onSubmit((values) => console.log(values))}>
+        <form onSubmit={formCreateProject.onSubmit(createProject)}>
+          {
+        !errorMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.red[0],
+              color: theme.colors.red,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.red[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">
+              {errorMessage}
+            </Text>
+          </Box>
+        )
+      }
           <TextInput
             label="Project name"
             size="sm"
@@ -117,7 +167,9 @@ function Index(props) {
             >
               {
                 chipItems.map((item) => (
-                  <Chip classNames={classes} value={item.value} key={item.value}>{item.name}</Chip>
+                  <Chip classNames={classes} value={item.value} key={item.value}>
+                    {item.name}
+                  </Chip>
                 ))
               }
 
@@ -131,31 +183,60 @@ function Index(props) {
 
           <Space h="md" />
           <Group position="right" spacing="xs">
-            <Button variant="filled" type="submit"> Create</Button>
+            <Button variant="filled" type="submit">
+              {' '}
+              { clientState.loading ? <LoadingOverlay visible overlayBlur={2} loaderProps={{ size: 'xs' }} /> : 'Create'}
+            </Button>
           </Group>
         </form>
       </Modal>
       <Box mt={25}>
         <Group position="right">
-          <Button leftIcon={<IconPlus size={16} />} radius="md" variant="filled" onClick={handleClickCreateBtn}>Create a Project</Button>
+          {
+            clientState.loading ? <Skeleton visible height={35} width={100} /> : <Button leftIcon={<IconPlus size={16} />} radius="md" variant="filled" onClick={handleClickCreateBtn}>Create a Project</Button>
+          }
         </Group>
+        {
+          clientState.loading && (
+            <>
+              <Skeleton visible height={65} mt={25} />
+              <Skeleton visible height={65} mt={25} />
+              <Skeleton visible height={65} mt={25} />
+            </>
+          )
+        }
 
         {/* CARD */}
-        <Box mt={25}>
-          <div
-            className={cx(classes.item)}
-          >
-            <IconGripVertical className={classes.symbol} />
-            <div>
-              <Text size="md">Title</Text>
-              <Text color="dimmed" size="sm">
-                Edited:
-                {' '}
-                10 July 2022
-              </Text>
-            </div>
-          </div>
-        </Box>
+        {
+          clientState.projects?.data && clientState.projects.data.map((project) => (
+            // eslint-disable-next-line no-underscore-dangle
+            <Box mt={25} key={project._id}>
+              <div
+                className={cx(classes.item)}
+              >
+                {
+                  project.project_type === 'workspace'
+                    ? <IconBriefcase className={classes.symbol} />
+                    : project.project_type === 'personal'
+                      ? <IconUser className={classes.symbol} />
+                      : <IconGrain className={classes.symbol} />
+                }
+
+                <div>
+                  <Text size="md">{project.project_name}</Text>
+                  <Text color="dimmed" size="sm">
+                    Edited:
+                    {' '}
+                    {
+                      moment(project.updatedAt).fromNow()
+                    }
+                    {/* {new Date(project.updated_at)} */}
+                  </Text>
+                </div>
+              </div>
+            </Box>
+          ))
+        }
         {/* End Card */}
       </Box>
 

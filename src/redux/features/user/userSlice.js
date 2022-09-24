@@ -21,7 +21,12 @@ export const userSlice = createSlice({
     });
     builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
       console.log('FulFilled ', action.payload);
-      state.user = action.payload;
+      if (action.payload === 'Session timeout' && !action.payload.success) {
+        localStorage.removeItem('rftoken_id');
+        state.user = {};
+      } else {
+        state.user = action.payload;
+      }
       state.loading = false;
     });
     builder.addCase(fetchUserInfo.rejected, (state) => {
