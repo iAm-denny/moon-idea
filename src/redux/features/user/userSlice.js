@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit';
 // eslint-disable-next-line import/no-cycle
 import api from '../../../config/api';
 
@@ -20,7 +20,6 @@ export const userSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(fetchUserInfo.fulfilled, (state, action) => {
-      console.log('FulFilled ', action.payload);
       if (action.payload === 'Session timeout' && !action.payload.success) {
         localStorage.removeItem('rftoken_id');
         state.user = {};
@@ -40,6 +39,29 @@ export const userSlice = createSlice({
     changeAccessToken: (state, action) => {
       state.user.accessToken = action.payload.accessToken;
     },
+    updateUserProfile: (state, action) => {
+      const currentState = current(state);
+      const { accessToken, user } = currentState.user;
+      const {
+        created_at, email, role, __v, _id,
+      } = user;
+      return {
+        loading: false,
+        user: {
+          accessToken,
+          user: {
+            created_at,
+            email,
+            fullname: action.payload.fullname,
+            profile: action.payload.profile,
+            profile_public_id: action.payload.profile_public_id,
+            role,
+            __v,
+            _id,
+          },
+        },
+      };
+    },
     getInfo: () => {
       createAsyncThunk();
     },
@@ -50,6 +72,8 @@ export const userSlice = createSlice({
     },
   },
 });
-export const { addUser, changeAccessToken, logout } = userSlice.actions;
+export const {
+  addUser, changeAccessToken, logout, updateUserProfile,
+} = userSlice.actions;
 
 export default userSlice.reducer;
