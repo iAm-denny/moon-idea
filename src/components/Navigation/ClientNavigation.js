@@ -1,23 +1,27 @@
+/* eslint-disable react/no-unknown-property */
+/* eslint-disable jsx-a11y/label-has-associated-control */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/jsx-props-no-spreading */
 import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   // eslint-disable-next-line max-len
-  AppShell, Burger, Navbar, createStyles, Center, Stack, Tooltip, UnstyledButton, Group, Header, MediaQuery, Paper, Box, Space, Button, LoadingOverlay, TextInput, Avatar,
+  AppShell, Burger, Navbar, createStyles, Center, Stack, Tooltip, UnstyledButton, Group, Header, MediaQuery, Paper, Box, Space, Button, LoadingOverlay, TextInput, Avatar, FileInput,
 } from '@mantine/core';
 import {
   IconFolder, IconUsers, IconLogout,
   IconUserCircle,
+  IconPhoto,
 } from '@tabler/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useForm, yupResolver } from '@mantine/form';
 import * as Yup from 'yup';
 import useResponsive from '../../utils/responsive';
-import { logout } from '../../redux/features/user/userSlice';
+import { logout, updateUserProfile } from '../../redux/features/user/userSlice';
 import Modal from '../Modal/Modal';
 import Text from '../Typography/Text';
+import api from '../../config/api';
 
 const useStyles = createStyles((theme) => ({
   appshellRoot: {
@@ -78,15 +82,30 @@ const profileInputItems = [
   },
 ];
 
+const SUPPORTED_FORMATS = ['image/jpg', 'image/jpeg', 'image/png'];
+
 const profileSchema = Yup.object().shape({
   fullname: Yup.string().min(2, 'Name should have at least 2 letters'),
   email: Yup.string().email('Invalid email').required('Required field.'),
+  profile: Yup.mixed()
+    .test(
+      'fileSize',
+      'The file is too large',
+      (value) => (typeof value !== 'string' ? !value || (value && value.size <= 1024 * 1024) : true),
+    )
+    .test(
+      'type',
+      'Only the following formats are accepted: .jpg, jpeg, png',
+      (value) => (typeof value !== 'string' ? !value || (value && SUPPORTED_FORMATS.includes(value.type)) : true),
+    ),
 });
 
 function ProfileContent() {
   const [errorMessage, setErrorMessage] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const [loader, setLoader] = useState(false);
   const userState = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
 
   const formProfile = useForm({
     validate: yupResolver(profileSchema),
@@ -94,11 +113,66 @@ function ProfileContent() {
     initialValues: {
       fullname: userState.user.fullname,
       email: userState.user.email,
+      profile: userState.user?.profile || '',
     },
   });
+
+  const convertImageToBase64 = (file) => new Promise((resolve) => {
+    let baseURL = '';
+    // Make new FileReader
+    const reader = new FileReader();
+
+    // Convert the file to base64 text
+    reader.readAsDataURL(file);
+
+    // on reader load somthing...
+    reader.onload = () => {
+      // Make a fileInfo Object
+      baseURL = reader.result;
+      resolve(baseURL);
+    };
+  });
+
+  const updateProfile = async (values) => {
+    setErrorMessage(null);
+    setSuccessMessage(null);
+    let profileBase64 = '';
+    const profile_public_id = userState.user?.profile_public_id || '';
+    if (values.profile) {
+      if (typeof values.profile === 'string' && values.profile.includes('http')) {
+        profileBase64 = values.profile;
+      } else {
+        profileBase64 = await convertImageToBase64(values.profile);
+      }
+    }
+
+    setLoader(true);
+    api.post('/user/update-profile', JSON.stringify({
+      fullname: values.fullname,
+      profile: profileBase64,
+      profile_public_id,
+    }), { accessToken: userState.accessToken, rftoken_id: localStorage.getItem('rftoken_id') })
+      .then((res) => {
+        if (res.success) {
+          dispatch(updateUserProfile(res.data));
+          setSuccessMessage('Successfully updated.');
+          setErrorMessage(null);
+        } else {
+          setSuccessMessage(null);
+          setErrorMessage('Something went wrong');
+        }
+        setLoader(false);
+      })
+      .catch((err) => {
+        console.log('err', err);
+        setErrorMessage('Something went wrong');
+        setLoader(false);
+      });
+  };
+
   return (
     <form
-      onSubmit={formProfile.onSubmit((value) => console.log('value', value))}
+      onSubmit={formProfile.onSubmit(updateProfile)}
       autoComplete="chrome-off"
     >
       {
@@ -119,10 +193,61 @@ function ProfileContent() {
           </Box>
         )
       }
+      {
+        successMessage && (
+          <Box
+            sx={(theme) => ({
+              backgroundColor: theme.colors.green[0],
+              color: theme.colors.green,
+              borderWidth: 1,
+              borderStyle: 'solid',
+              borderColor: theme.colors.green[5],
+              textAlign: 'center',
+              padding: theme.spacing.xs,
+              borderRadius: theme.radius.md,
+            })}
+          >
+            <Text size="sm">{successMessage}</Text>
+          </Box>
+        )
+      }
       <Space h="md" />
       <Group position="center">
-        <Avatar color="cyan" radius="xl" size="xl">{userState.user.fullname[0]}</Avatar>
+        <div style={{
+          width: 84, height: 84, borderRadius: 32, position: 'relative',
+        }}
+        >
+          {
+            formProfile.getInputProps('profile').value ? (
+              <Avatar radius="xl" size="xl" src={typeof formProfile.getInputProps('profile').value === 'string' && formProfile.getInputProps('profile').value.includes('http') ? formProfile.getInputProps('profile').value : URL.createObjectURL(formProfile.getInputProps('profile').value)} />
+            ) : <Avatar color="cyan" radius="xl" size="xl">{userState.user.fullname[0]}</Avatar>
+          }
+
+          <label
+            htmlFor="profile"
+            style={{
+              position: 'absolute',
+              right: -5,
+              bottom: -5,
+              background: '#fff',
+              borderRadius: 50,
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              cursor: 'pointer',
+              backgroundColor: 'rgba(161, 153, 255, 1)',
+              padding: 3,
+
+            }}
+          >
+            <IconPhoto size={20} color="#1400FF" />
+          </label>
+          <FileInput id="profile" {...formProfile.getInputProps('profile')} style={{ display: 'none' }} accept="image/jpeg, image/png, image/jpg" />
+        </div>
       </Group>
+      <div style={{ textAlign: 'center' }}>
+        {formProfile.errors?.profile && <Text color="red">{formProfile.errors?.profile}</Text>}
+      </div>
       <Space h="md" />
       {
         profileInputItems.map((item) => (
