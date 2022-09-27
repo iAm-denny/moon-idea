@@ -9,7 +9,8 @@ function LineShape(props) {
 
   const { // eslint-disable-next-line react/prop-types
     fill, stroke, id, points,
-  } = data;
+  // eslint-disable-next-line react/prop-types
+  } = data.data;
   return (
     <Line
       points={points}
@@ -18,7 +19,7 @@ function LineShape(props) {
       key={id}
       onClick={(e) => {
         e.cancelBubble = true;
-        onSelectShape(props);
+        onSelectShape(data);
       }}
     />
   );

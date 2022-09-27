@@ -6,10 +6,10 @@ function Rectangle(props) {
     // eslint-disable-next-line react/prop-types
     data, onSelectShape,
   } = props;
-
   const { // eslint-disable-next-line react/prop-types
     x, y, width, height, fill, stroke, id,
-  } = data;
+  // eslint-disable-next-line react/prop-types
+  } = data.data;
 
   return (
     <RectangleKonva
@@ -22,7 +22,7 @@ function Rectangle(props) {
       stroke={stroke}
       onClick={(e) => {
         e.cancelBubble = true;
-        onSelectShape(props);
+        onSelectShape(data);
       }}
     />
   );

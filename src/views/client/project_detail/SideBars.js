@@ -27,11 +27,11 @@ function SideBars(props) {
       height: '100vh',
     }}
     >
-
       <AppShell
         styles={{
           main: {
             background: theme.colors.gray[0],
+            padding: 0,
           },
         }}
         navbarOffsetBreakpoint="sm"

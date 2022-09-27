@@ -23,19 +23,19 @@ function RightSideBar() {
         </Tabs.List>
       </Tabs>
       {
-        selectShapeValue?.fill && (
+        selectShapeValue?.data?.fill && (
         <Container>
           <Box my={15}>
             <ColorInput
               label="Fill"
-              value={selectShapeValue?.fill}
+              value={selectShapeValue?.data?.fill}
               onChange={(value) => dispatch(changeFillShape(value))}
             />
           </Box>
           <Box my={15}>
             <ColorInput
               label="Stroke"
-              value={selectShapeValue?.stroke}
+              value={selectShapeValue?.data?.stroke}
               onChange={(value) => dispatch(changeStrokeShape(value))}
             />
           </Box>
