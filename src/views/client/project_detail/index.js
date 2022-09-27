@@ -48,21 +48,15 @@ const index = () => {
     }
   }, [isSmall]);
 
-  const getNewDrawableBasedOnType = (data) => {
-    if (selectShapeType === 'RectangleShape') {
-      <RectangleShape data={data} />;
-    }
-  };
-
   const onSelectShape = (propsData) => {
     if (selectShapeType === 'Pointer') {
-      dispatch(selectShape(propsData));
+      dispatch(selectShape({ data: propsData }));
     }
   };
 
   // eslint-disable-next-line consistent-return
   const renderShape = (data) => {
-    switch (data?.type) {
+    switch (data?.data?.type) {
       case 'RectangleShape':
         return <RectangleShape data={data} onSelectShape={onSelectShape} />;
       case 'CircleShape':
@@ -116,7 +110,13 @@ const index = () => {
       default:
         data = {};
     }
-    return data;
+    const shapeData = {
+      id,
+      data,
+      created_by: '123',
+      project_id: '456',
+    };
+    return shapeData;
   };
 
   const nameShape = (name) => {
@@ -158,20 +158,19 @@ const index = () => {
       setStartY(y);
       const width = 0; const height = 0;
       const name = nameShape(selectShapeType);
-      const newShape = getNewDrawableBasedOnType(
-        {
-          id: tempId,
-          x,
-          y,
-          type: selectShapeType,
-          width,
-          height,
-          name,
-          fill: defaultColor,
-          stroke: defaultStrokeColor,
-        },
-      );
-      setNewDrawable([newShape]);
+      const tempData = {
+        id: tempId,
+        x,
+        y,
+        type: selectShapeType,
+        width,
+        height,
+        name,
+        fill: defaultColor,
+        stroke: defaultStrokeColor,
+      };
+      const data = responseShapeValue(tempData);
+      setNewDrawable([data]);
     }
   };
 

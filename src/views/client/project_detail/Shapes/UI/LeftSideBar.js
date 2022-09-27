@@ -43,18 +43,19 @@ function LeftSideBar({ currentItems, setCurrentItems }) {
     setData(currentItems);
   }, [currentItems]);
 
+  // eslint-disable-next-line no-shadow
   const items = data && data.map((item) => (
     <div
       key={item?.id || Math.random()}
       className={cx(classes.item, { [classes.active]: item?.id === selectShapeValue?.id })}
-      // className={classes.item}
+        // className={classes.item}
       onClick={() => {
-        if (item && item?.id) dispatch(selectShape({ data: item }));
+        if (item.data && item.data?.id) dispatch(selectShape({ data: item }));
       }}
       aria-hidden="true"
     >
-      {item?.name.icon}
-      <Text size="xs">{item?.name.name}</Text>
+      {item.data?.name.icon}
+      <Text size="xs">{item.data?.name.name}</Text>
     </div>
   ));
 

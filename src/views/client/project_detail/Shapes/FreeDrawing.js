@@ -9,7 +9,8 @@ function FreeDrawing(props) {
 
   const { // eslint-disable-next-line react/prop-types
     fill, stroke, id, points,
-  } = data;
+  // eslint-disable-next-line react/prop-types
+  } = data.data;
 
   return (
     <Line
@@ -19,7 +20,7 @@ function FreeDrawing(props) {
       stroke={stroke}
       onClick={(e) => {
         e.cancelBubble = true;
-        onSelectShape(props);
+        onSelectShape(data);
       }}
     />
   );

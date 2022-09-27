@@ -21,7 +21,8 @@ export const shapeSlice = createSlice({
     changeFillShape: (state, action) => {
       if (action.payload) {
         const { shapesItem } = state;
-        const updatedVal = { ...state.selectShapeValue, fill: action.payload };
+        const updatedVal = { ...state.selectShapeValue };
+        updatedVal.data.fill = action.payload;
         state.selectShapeValue = updatedVal;
         shapesItem[shapesItem.findIndex((el) => el.id === updatedVal.id)] = updatedVal;
       }
@@ -29,7 +30,8 @@ export const shapeSlice = createSlice({
     changeStrokeShape: (state, action) => {
       if (action.payload) {
         const { shapesItem } = state;
-        const updatedVal = { ...state.selectShapeValue, stroke: action.payload };
+        const updatedVal = { ...state.selectShapeValue };
+        updatedVal.data.stroke = action.payload;
         state.selectShapeValue = updatedVal;
         shapesItem[shapesItem.findIndex((el) => el.id === updatedVal.id)] = updatedVal;
       }
