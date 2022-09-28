@@ -8,14 +8,17 @@ import NavigationLoader from './components/Loader/LazyLoader/NavigationLoader';
 import Navigation from './components/Navigation/index';
 import routes from './routes';
 import { fetchUserInfo } from './redux/features/user/userSlice';
+import useNetwork from './custom-hooks/useNetwork';
 
 const NotFoundPage = lazy(() => import('./NotFound'));
 function App() {
+  const { online } = useNetwork();
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(fetchUserInfo());
   }, []);
+  console.log('online', online);
 
   useEffect(() => {
     if (userState?.user?.accessToken && window.location.pathname === '/') {
