@@ -4,6 +4,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
+import { useNetwork } from '@mantine/hooks';
 import NavigationLoader from './components/Loader/LazyLoader/NavigationLoader';
 import Navigation from './components/Navigation/index';
 import routes from './routes';
@@ -11,6 +12,7 @@ import { fetchUserInfo } from './redux/features/user/userSlice';
 
 const NotFoundPage = lazy(() => import('./NotFound'));
 function App() {
+  const { online } = useNetwork();
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
   useEffect(() => {
@@ -22,6 +24,8 @@ function App() {
       window.location.href = 'client/my-projects';
     }
   }, [userState.user]);
+
+  console.log('online', online);
 
   return (
     <Suspense fallback={<NavigationLoader />}>
