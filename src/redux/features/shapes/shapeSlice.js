@@ -14,8 +14,6 @@ export const makeChangesShape = createAsyncThunk('makeChangesShape', (data, { ge
   const { accessToken } = state.user.user;
   const { selectShapeValue } = state.shape;
   let sendData = {};
-  console.log('data', data);
-  console.log('data', selectShapeValue);
   if (data.isNew) {
     sendData = data.data;
   } else {
@@ -36,8 +34,7 @@ export const shapeSlice = createSlice({
     builder.addCase(makeChangesShape.pending, (state) => {
       state.loading = true;
     });
-    builder.addCase(makeChangesShape.fulfilled, (state, action) => {
-      console.log('action', action);
+    builder.addCase(makeChangesShape.fulfilled, (state) => {
       state.loading = false;
     });
     builder.addCase(makeChangesShape.rejected, (state) => {
