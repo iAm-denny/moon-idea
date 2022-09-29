@@ -21,6 +21,7 @@ function SideBars(props) {
   } = props;
   const theme = useMantineTheme();
   const { isSmall } = useResponsive();
+
   return (
     <div style={{
       overflow: 'hidden',
@@ -40,8 +41,8 @@ function SideBars(props) {
         <Navbar p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
           <LeftSideBar currentItems={currentItems} setCurrentItems={setCurrentItems} />
         </Navbar>
-
         )}
+        // eslint-disable-next-line react/jsx-props-no-multi-spaces
         aside={!isSmall && (
         <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
           <Aside p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>

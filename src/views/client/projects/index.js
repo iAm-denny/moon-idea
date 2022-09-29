@@ -10,6 +10,7 @@ import * as Yup from 'yup';
 import { useForm, yupResolver } from '@mantine/form';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { Link } from 'react-router-dom';
 import Title from '../../../components/Typography/Title';
 import Text from '../../../components/Typography/Text';
 import Modal from '../../../components/Modal/Modal';
@@ -28,6 +29,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     paddingLeft: theme.spacing.xl - theme.spacing.md, // to offset drag handle
     backgroundColor: theme.colorScheme === 'dark' ? theme.colors.dark[5] : theme.white,
     marginBottom: theme.spacing.sm,
+    cursor: 'pointer',
+    color: '#000',
+    textDecoration: 'none',
   },
   chipBox: {
     width: '100%',
@@ -209,7 +213,10 @@ function Index(props) {
           clientState.projects?.data && clientState.projects.data.map((project) => (
             // eslint-disable-next-line no-underscore-dangle
             <Box mt={25} key={project._id}>
-              <div
+              <Link
+                // component={Link}
+                // eslint-disable-next-line no-underscore-dangle
+                to={`/client/my-projects/${project._id}`}
                 className={cx(classes.item)}
               >
                 {
@@ -231,7 +238,7 @@ function Index(props) {
                     {/* {new Date(project.updated_at)} */}
                   </Text>
                 </div>
-              </div>
+              </Link>
             </Box>
           ))
         }
