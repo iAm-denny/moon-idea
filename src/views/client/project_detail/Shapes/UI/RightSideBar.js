@@ -3,11 +3,13 @@ import {
   Box, ColorInput, Container, ScrollArea, Tabs,
 } from '@mantine/core';
 import { useSelector, useDispatch } from 'react-redux';
+import { useParams } from 'react-router-dom';
 import Text from '../../../../../components/Typography/Text';
-import { changeFillShape, changeStrokeShape } from '../../../../../redux/features/shapes/shapeSlice';
+import { changeFillShape, changeStrokeShape, makeChangesShape } from '../../../../../redux/features/shapes/shapeSlice';
 
 function RightSideBar() {
   const { selectShapeValue } = useSelector((state) => state.shape);
+  const params = useParams();
   const dispatch = useDispatch();
 
   return (
@@ -29,8 +31,10 @@ function RightSideBar() {
             <ColorInput
               label="Fill"
               value={selectShapeValue?.data?.fill}
+              // onChange={(value) => dispatch(changeFillShape(value))}
               onChange={(value) => {
                 dispatch(changeFillShape(value));
+                dispatch(makeChangesShape({ fill: value, project_id: params.id }));
               }}
             />
           </Box>
@@ -38,7 +42,11 @@ function RightSideBar() {
             <ColorInput
               label="Stroke"
               value={selectShapeValue?.data?.stroke}
-              onChange={(value) => dispatch(changeStrokeShape(value))}
+                // onChange={(value) => dispatch(changeFillShape(value))}
+              onChange={(value) => {
+                dispatch(changeStrokeShape(value));
+                dispatch(makeChangesShape({ stroke: value }));
+              }}
             />
           </Box>
         </Container>

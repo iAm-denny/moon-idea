@@ -6,10 +6,10 @@ import {
 } from 'react-konva';
 import { useSelector, useDispatch } from 'react-redux';
 import { v4 as uuid } from 'uuid';
+import { useParams } from 'react-router-dom';
 import {
-  IconRectangle, IconPencil, IconArrowRight, IconLine, IconPointer,
-} from '@tabler/icons';
-import { addShape, selectShape } from '../../../redux/features/shapes/shapeSlice';
+  addShape, makeChangesShape, selectShape, fetchProjectDetail,
+} from '../../../redux/features/shapes/shapeSlice';
 import SideBars from './SideBars';
 import FreeDrawing from './Shapes/FreeDrawing';
 import ArrowShape from './Shapes/Arrow';
@@ -21,7 +21,10 @@ import useResponsive from '../../../utils/responsive';
 
 const index = () => {
   const shapeState = useSelector((state) => state.shape);
+  const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
+  const params = useParams();
+
   const { fill: defaultColor, stroke: defaultStrokeColor } = colors.shape;
   const { isSmall } = useResponsive();
   const [stage, setStage] = useState({
@@ -113,35 +116,30 @@ const index = () => {
     const shapeData = {
       id,
       data,
-      created_by: '123',
-      project_id: '456',
+      // eslint-disable-next-line no-underscore-dangle
+      created_by: userState.user.user._id,
+      project_id: params.id,
     };
     return shapeData;
   };
 
   const nameShape = (name) => {
-    const iconSize = 14;
     const property = {};
     switch (name) {
       case 'RectangleShape':
         property.name = `Rectangle ${shapeItems.length}`;
-        property.icon = <IconRectangle size={iconSize} />;
         break;
       case 'CircleShape':
         property.name = `Circle ${shapeItems.length}`;
-        property.icon = <IconArrowRight size={iconSize} />;
         break;
       case 'ArrowShape':
         property.name = `Arrow ${shapeItems.length}`;
-        property.icon = <IconLine size={iconSize} />;
         break;
       case 'LineShape':
         property.name = `Line ${shapeItems.length}`;
-        property.icon = <IconPencil size={iconSize} />;
         break;
       case 'FreeDrawing':
         property.name = `Pen ${shapeItems.length}`;
-        property.icon = <IconPointer size={iconSize} />;
         break;
       default:
         break;
@@ -204,9 +202,14 @@ const index = () => {
         sx: startX, sy: startY, x, y, color: defaultColor, stroke: defaultStrokeColor, tempPoints, isDone: true, name,
       };
       const data = responseShapeValue(tempData);
-      dispatch(addShape(data));
-      onSelectShape(data);
-      dispatch(selectShape({ data }));
+
+      if (data?.data?.width !== 0 && data?.data?.height !== 0) {
+        dispatch(addShape(data));
+        onSelectShape(data);
+        dispatch(selectShape(data));
+        dispatch(makeChangesShape({ isNew: true, data }));
+      }
+
       setNewDrawable([]);
       setPoints([]);
     }
@@ -242,6 +245,10 @@ const index = () => {
       });
     }
   };
+
+  useEffect(() => {
+    dispatch(fetchProjectDetail(params.id));
+  }, []);
 
   return (
     <SideBars changeSelectShapeTypehandle={changeSelectShapeTypehandle} selectShapeType={selectShapeType} currentItems={shapeItems} setCurrentItems={setShapeItems}>
