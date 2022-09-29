@@ -31,9 +31,10 @@ function RightSideBar() {
             <ColorInput
               label="Fill"
               value={selectShapeValue?.data?.fill}
-              // onChange={(value) => dispatch(changeFillShape(value))}
               onChange={(value) => {
                 dispatch(changeFillShape(value));
+              }}
+              onChangeEnd={(value) => {
                 dispatch(makeChangesShape({ fill: value, project_id: params.id }));
               }}
             />
