@@ -127,6 +127,7 @@ function Index(props) {
     })
       .catch(() => setErrorMessage('Something went wrong'));
   };
+
   return (
     <div>
       <Title order={1}>{title}</Title>

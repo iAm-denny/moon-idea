@@ -7,6 +7,7 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import { useParams } from 'react-router-dom';
+import moment from 'moment/moment';
 import {
   addShape, makeChangesShape, selectShape, fetchProjectDetail,
 } from '../../../redux/features/shapes/shapeSlice';
@@ -119,6 +120,8 @@ const index = () => {
       // eslint-disable-next-line no-underscore-dangle
       created_by: userState.user.user._id,
       project_id: params.id,
+      createdAt: moment().utc().format(),
+      updatedAt: moment().utc().format(),
     };
     return shapeData;
   };
