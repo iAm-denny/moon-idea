@@ -9,11 +9,15 @@ import {
   useMantineTheme,
   Tabs,
   Tooltip,
+  Loader,
 } from '@mantine/core';
+import { useSelector } from 'react-redux';
+import moment from 'moment';
 import { shapeIcons } from './Shapes/UI/shapeIcons';
 import LeftSideBar from './Shapes/UI/LeftSideBar';
 import useResponsive from '../../../utils/responsive';
 import RightSideBar from './Shapes/UI/RightSideBar';
+import Text from '../../../components/Typography/Text';
 
 function SideBars(props) {
   const {
@@ -21,7 +25,25 @@ function SideBars(props) {
   } = props;
   const theme = useMantineTheme();
   const { isSmall } = useResponsive();
+  const { makeChangesLoader, shapesItem } = useSelector((state) => state.shape);
+  const { fetchingShapesLoader } = useSelector((state) => state.shape);
 
+  const lastItem = shapesItem && shapesItem.length > 0 ? shapesItem[shapesItem.length - 1] : '';
+  if (fetchingShapesLoader) {
+    return (
+      <div style={{
+        height: '80vh',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+      >
+        <Loader color="gray" />
+        <Text>Please wait a momemt :D</Text>
+      </div>
+    );
+  }
   return (
     <div style={{
       overflow: 'hidden',
@@ -52,7 +74,10 @@ function SideBars(props) {
         )}
         header={!isSmall && (
         <Header height={40} p="md" hiddenbreakpoint="sm">
-          <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+          <div style={{
+            display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'space-between',
+          }}
+          >
             <Tabs value={selectShapeType} onTabChange={(value) => changeSelectShapeTypehandle(value)}>
               <Tabs.List>
                 {
@@ -64,6 +89,15 @@ function SideBars(props) {
               }
               </Tabs.List>
             </Tabs>
+            {
+              makeChangesLoader ? <Text size="sm" color="gray">Saving a file</Text> : lastItem ? (
+                <Text size="sm" color="gray">
+                  Saved a file:
+                  {' '}
+                  {lastItem && moment(lastItem.createdAt).format('DD--MMM-YYYY')}
+                </Text>
+              ) : null
+            }
           </div>
         </Header>
         )}

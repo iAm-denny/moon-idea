@@ -5,7 +5,7 @@ import api from '../../../config/api';
 const initialState = {
   shapesItem: [],
   selectShapeValue: {},
-  loading: false,
+  makeChangesLoader: false,
   fetchingShapesLoader: false,
 };
 
@@ -32,13 +32,13 @@ export const shapeSlice = createSlice({
   initialState,
   extraReducers: (builder) => {
     builder.addCase(makeChangesShape.pending, (state) => {
-      state.loading = true;
+      state.makeChangesLoader = true;
     });
     builder.addCase(makeChangesShape.fulfilled, (state) => {
-      state.loading = false;
+      state.makeChangesLoader = false;
     });
     builder.addCase(makeChangesShape.rejected, (state) => {
-      state.loading = false;
+      state.makeChangesLoader = false;
     });
     // ------- Fetch the project shapes
     builder.addCase(fetchProjectDetail.pending, (state) => {
