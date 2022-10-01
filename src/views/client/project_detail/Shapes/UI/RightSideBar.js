@@ -5,7 +5,9 @@ import {
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Text from '../../../../../components/Typography/Text';
-import { changeFillShape, changeStrokeShape, makeChangesShape } from '../../../../../redux/features/shapes/shapeSlice';
+import {
+  makeChangesShape, updateSelectShapeValue,
+} from '../../../../../redux/features/shapes/shapeSlice';
 
 function RightSideBar() {
   const { selectShapeValue } = useSelector((state) => state.shape);
@@ -32,7 +34,7 @@ function RightSideBar() {
               label="Fill"
               value={selectShapeValue?.data?.fill}
               onChange={(value) => {
-                dispatch(changeFillShape(value));
+                dispatch(updateSelectShapeValue({ fill: value }));
               }}
               onChangeEnd={(value) => {
                 dispatch(makeChangesShape({ fill: value, project_id: params.id }));
@@ -43,10 +45,11 @@ function RightSideBar() {
             <ColorInput
               label="Stroke"
               value={selectShapeValue?.data?.stroke}
-                // onChange={(value) => dispatch(changeFillShape(value))}
               onChange={(value) => {
-                dispatch(changeStrokeShape(value));
-                dispatch(makeChangesShape({ stroke: value }));
+                dispatch(updateSelectShapeValue({ stroke: value }));
+              }}
+              onChangeEnd={(value) => {
+                dispatch(makeChangesShape({ stroke: value, project_id: params.id }));
               }}
             />
           </Box>

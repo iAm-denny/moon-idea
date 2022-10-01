@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit';
 import api from '../../../config/api';
 
 const initialState = {
@@ -19,12 +19,11 @@ export const makeChangesShape = createAsyncThunk('makeChangesShape', (data, { ge
   } else {
     sendData = selectShapeValue;
   }
-
   return api.post('/client/project-shape', JSON.stringify(sendData), { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => { console.log('err => ', err); });
 });
 
 export const fetchProjectDetail = createAsyncThunk('fetchProjectDetail', (project_id) => api.get('/client/project-shape', { project_id }, { rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => {
-  console.log('err => ', err);
+  console.error('err => ', err);
 }));
 
 export const shapeSlice = createSlice({
@@ -63,32 +62,28 @@ export const shapeSlice = createSlice({
         state.selectShapeValue = action.payload?.data;
       }
     },
-    changeFillShape: (state, action) => {
-      if (action.payload) {
-        const { shapesItem } = state;
-        const updatedVal = { ...state.selectShapeValue };
-        updatedVal.data.fill = action.payload;
-        state.selectShapeValue = updatedVal;
-        shapesItem[shapesItem.findIndex((el) => el.id === updatedVal.id)] = updatedVal;
-      }
+    updateSelectShapeValue: (state, action) => {
+      const data = action.payload;
+      const { shapesItem } = state;
+      const { selectShapeValue } = current(state);
+      const newData = {
+        ...selectShapeValue,
+        data: {
+          ...selectShapeValue.data,
+          ...data,
+        },
+      };
+      state.selectShapeValue = newData;
+      shapesItem[shapesItem.findIndex((el) => el.id === newData.id)] = newData;
     },
-    changeStrokeShape: (state, action) => {
-      if (action.payload) {
-        const { shapesItem } = state;
-        const updatedVal = { ...state.selectShapeValue };
-        updatedVal.data.stroke = action.payload;
-        state.selectShapeValue = updatedVal;
-        shapesItem[shapesItem.findIndex((el) => el.id === updatedVal.id)] = updatedVal;
-      }
-    },
-    makeChangesShape: () => {
+    asynFunction: () => {
       createAsyncThunk();
     },
   },
 });
 
 export const {
-  addShape, selectShape, changeFillShape, changeStrokeShape,
+  addShape, selectShape, changeFillShape, changeStrokeShape, updateSelectShapeValue,
 } = shapeSlice.actions;
 
 export default shapeSlice.reducer;
