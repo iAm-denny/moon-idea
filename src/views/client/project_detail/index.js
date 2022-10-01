@@ -1,3 +1,4 @@
+/* eslint-disable react/jsx-props-no-spreading */
 /* eslint-disable max-len */
 /* eslint-disable max-classes-per-file */
 import React, { useEffect, useState } from 'react';
@@ -9,7 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { useParams } from 'react-router-dom';
 import moment from 'moment/moment';
 import {
-  addShape, makeChangesShape, selectShape, fetchProjectDetail,
+  addShape, makeChangesShape, selectShape, fetchProjectDetail, updateSelectShapeValue,
 } from '../../../redux/features/shapes/shapeSlice';
 import SideBars from './SideBars';
 import FreeDrawing from './Shapes/FreeDrawing';
@@ -58,19 +59,49 @@ const index = () => {
     }
   };
 
+  const handleDragEnd = (e, data) => {
+    onSelectShape(data);
+    const position = {
+      x: e.target.x(),
+      y: e.target.y(),
+    };
+    dispatch(updateSelectShapeValue(position));
+    dispatch(makeChangesShape({ isNew: false }));
+  };
+
+  const handleTransformEnd = (e) => {
+    const data = {
+      x: e.target.x(),
+      y: e.target.y(),
+      scaleX: e.target.scaleX(),
+      scaleY: e.target.scaleY(),
+      rotation: e.target.rotation(),
+    };
+    dispatch(updateSelectShapeValue(data));
+    dispatch(makeChangesShape({ isNew: false }));
+  };
+
+  const passProps = {
+    selectShapeValue: shapeState.selectShapeValue,
+    onSelectShape,
+    handleDragEnd,
+    selectShapeType,
+    handleTransformEnd,
+  };
+
   // eslint-disable-next-line consistent-return
   const renderShape = (data) => {
     switch (data?.data?.type) {
       case 'RectangleShape':
-        return <RectangleShape data={data} onSelectShape={onSelectShape} />;
+        return <RectangleShape data={data} {...passProps} />;
       case 'CircleShape':
-        return <CircleShape data={data} onSelectShape={onSelectShape} />;
+        return <CircleShape data={data} {...passProps} />;
       case 'ArrowShape':
-        return <ArrowShape data={data} onSelectShape={onSelectShape} />;
+        return <ArrowShape data={data} {...passProps} />;
       case 'LineShape':
-        return <LineShape data={data} onSelectShape={onSelectShape} />;
+        return <LineShape data={data} {...passProps} />;
       case 'FreeDrawing':
-        return <FreeDrawing data={data} onSelectShape={onSelectShape} />;
+        return <FreeDrawing data={data} {...passProps} />;
       default:
         break;
     }
@@ -268,10 +299,14 @@ const index = () => {
         height={window.innerHeight * 3}
       >
         <Layer>
+
           {
-            // eslint-disable-next-line array-callback-return, consistent-return
-            shapeItems.map((item) => renderShape(item))
+          // eslint-disable-next-line array-callback-return, consistent-return
+          shapeItems.map((item) => (
+            renderShape(item)
+          ))
           }
+
         </Layer>
       </Stage>
     </SideBars>

@@ -1,28 +1,48 @@
-import React from 'react';
-import { Arrow } from 'react-konva';
+/* eslint-disable react/prop-types */
+import React, { useEffect, useRef } from 'react';
+import { Arrow, Transformer } from 'react-konva';
 
 function ArrowShape(props) {
+  const shapeRef = useRef();
+  const trRef = useRef();
   const {
-    // eslint-disable-next-line react/prop-types
-    data, onSelectShape,
+    data, onSelectShape, handleDragEnd, selectShapeType, selectShapeValue, handleTransformEnd,
   } = props;
 
-  const { // eslint-disable-next-line react/prop-types
-    fill, stroke, id, points,
-  // eslint-disable-next-line react/prop-types
+  const {
+    fill, stroke, id, points, x, y, scaleX, scaleY, rotation,
   } = data.data;
 
+  useEffect(() => {
+    if (selectShapeValue.id === id) {
+      trRef.current.nodes([shapeRef.current]);
+      trRef.current.getLayer().batchDraw();
+    }
+  }, [selectShapeValue]);
+
   return (
-    <Arrow
-      key={id}
-      points={points}
-      fill={fill}
-      stroke={stroke}
-      onClick={(e) => {
-        e.cancelBubble = true;
-        onSelectShape(data);
-      }}
-    />
+    <>
+      <Arrow
+        ref={shapeRef}
+        draggable={selectShapeType === 'Pointer'}
+        key={id}
+        points={points}
+        fill={fill}
+        x={x}
+        y={y}
+        stroke={stroke}
+        onClick={(e) => {
+          e.cancelBubble = true;
+          onSelectShape(data);
+        }}
+        scaleX={scaleX}
+        scaleY={scaleY}
+        rotation={rotation}
+        onTransformEnd={handleTransformEnd}
+        onDragEnd={(e) => handleDragEnd(e, data)}
+      />
+      {selectShapeValue.id === id && <Transformer ref={trRef} />}
+    </>
   );
 }
 

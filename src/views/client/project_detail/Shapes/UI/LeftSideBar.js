@@ -83,7 +83,7 @@ function LeftSideBar({ currentItems, setCurrentItems }) {
     >
       {nameShape(item.data?.type).icon}
 
-      <Text size="xs">{item.data?.name.name}</Text>
+      <Text size="xs">{item.data?.name?.name}</Text>
     </div>
   ));
 
