@@ -4,7 +4,7 @@ import { Text as TextManTine } from '@mantine/core';
 import useResponsive from '../../utils/responsive';
 
 function Text(props) {
-  const { children, size = 'md', mobilesize } = props;
+  const { children, size = 'md', mobilesize = 'sm' } = props;
   const { isSmall } = useResponsive();
 
   return (
@@ -16,14 +16,15 @@ function Text(props) {
 }
 
 Text.propTypes = {
-  children: PropTypes.string,
+  // eslint-disable-next-line react/forbid-prop-types
+  children: PropTypes.any,
   mobilesize: PropTypes.string,
   size: PropTypes.string.isRequired,
 };
 
 Text.defaultProps = {
   children: '',
-  mobilesize: '',
+  mobilesize: 'sm',
 };
 
 export default Text;

@@ -93,15 +93,15 @@ const index = () => {
   const renderShape = (data) => {
     switch (data?.data?.type) {
       case 'RectangleShape':
-        return <RectangleShape data={data} {...passProps} />;
+        return <RectangleShape data={data} {...passProps} key={data.id} />;
       case 'CircleShape':
-        return <CircleShape data={data} {...passProps} />;
+        return <CircleShape data={data} {...passProps} key={data.id} />;
       case 'ArrowShape':
-        return <ArrowShape data={data} {...passProps} />;
+        return <ArrowShape data={data} {...passProps} key={data.id} />;
       case 'LineShape':
-        return <LineShape data={data} {...passProps} />;
+        return <LineShape data={data} {...passProps} key={data.id} />;
       case 'FreeDrawing':
-        return <FreeDrawing data={data} {...passProps} />;
+        return <FreeDrawing data={data} {...passProps} key={data.id} />;
       default:
         break;
     }
@@ -299,14 +299,7 @@ const index = () => {
         height={window.innerHeight * 3}
       >
         <Layer>
-
-          {
-          // eslint-disable-next-line array-callback-return, consistent-return
-          shapeItems.map((item) => (
-            renderShape(item)
-          ))
-          }
-
+          {shapeItems.map((item) => renderShape(item))}
         </Layer>
       </Stage>
     </SideBars>

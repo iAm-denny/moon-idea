@@ -22,7 +22,6 @@ export const clientSlice = createSlice({
       state.loading = true;
     });
     builder.addCase(fetchProjectList.fulfilled, (state, action) => {
-      console.log('FulFilled ', action.payload);
       if (action.payload === 'Session timeout' && !action.payload.success) {
         localStorage.removeItem('rftoken_id');
         state.projects = {};
@@ -39,7 +38,7 @@ export const clientSlice = createSlice({
     addNewProject: (state, action) => {
       state.projects = { data: [action.payload, ...state.projects.data] };
     },
-    fetchProjectList: () => {
+    asynFunction: () => {
       createAsyncThunk();
     },
   },

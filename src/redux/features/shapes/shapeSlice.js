@@ -1,25 +1,31 @@
 /* eslint-disable no-param-reassign */
 import { createSlice, createAsyncThunk, current } from '@reduxjs/toolkit';
 import api from '../../../config/api';
+import { add } from '../../../utils/IndexDB/features';
 
 const initialState = {
   shapesItem: [],
   selectShapeValue: {},
   makeChangesLoader: false,
   fetchingShapesLoader: false,
+  isOnline: true,
 };
 
 export const makeChangesShape = createAsyncThunk('makeChangesShape', (data, { getState }) => {
   const state = getState();
   const { accessToken } = state.user.user;
-  const { selectShapeValue } = state.shape;
+  const { selectShapeValue, isOnline } = state.shape;
   let sendData = {};
   if (data.isNew) {
     sendData = data.data;
   } else {
     sendData = selectShapeValue;
   }
-  return api.post('/client/project-shape', JSON.stringify(sendData), { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => { console.log('err => ', err); });
+  console.log('sendData', sendData);
+  if (isOnline) {
+    return api.post('/client/project-shape', JSON.stringify(sendData), { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => { console.log('err => ', err); });
+  }
+  return add({ isNew: data.isNew, ...sendData });
 });
 
 export const fetchProjectDetail = createAsyncThunk('fetchProjectDetail', (project_id) => api.get('/client/project-shape', { project_id }, { rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => {
@@ -76,6 +82,9 @@ export const shapeSlice = createSlice({
       state.selectShapeValue = newData;
       shapesItem[shapesItem.findIndex((el) => el.id === newData.id)] = newData;
     },
+    updateNetWorkStatus: (state, action) => {
+      state.isOnline = action.payload;
+    },
     asynFunction: () => {
       createAsyncThunk();
     },
@@ -83,7 +92,12 @@ export const shapeSlice = createSlice({
 });
 
 export const {
-  addShape, selectShape, changeFillShape, changeStrokeShape, updateSelectShapeValue,
+  addShape,
+  selectShape,
+  changeFillShape,
+  changeStrokeShape,
+  updateSelectShapeValue,
+  updateNetWorkStatus,
 } = shapeSlice.actions;
 
 export default shapeSlice.reducer;
