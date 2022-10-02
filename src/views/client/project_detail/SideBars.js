@@ -40,7 +40,7 @@ function SideBars(props) {
       }}
       >
         <Loader color="gray" />
-        <Text>Please wait a momemt :D</Text>
+        <Text size="md">Please wait a momemt :D</Text>
       </div>
     );
   }

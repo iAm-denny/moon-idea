@@ -51,3 +51,16 @@ export const searchbyId = (searchVal, callback) => {
   }
   return undefined;
 };
+
+export const dropDB = () => {
+  const DBDeleteRequest = window.indexedDB.deleteDatabase('shapes');
+  DBDeleteRequest.onerror = (event) => {
+    console.error('Error deleting database.', event);
+  };
+
+  DBDeleteRequest.onsuccess = (event) => {
+    console.log('Database deleted successfully');
+
+    console.log(event.result); // should be undefined
+  };
+};

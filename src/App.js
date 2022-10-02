@@ -9,6 +9,8 @@ import NavigationLoader from './components/Loader/LazyLoader/NavigationLoader';
 import Navigation from './components/Navigation/index';
 import routes from './routes';
 import { fetchUserInfo } from './redux/features/user/userSlice';
+import { makeChangesShape, updateNetWorkStatus } from './redux/features/shapes/shapeSlice';
+import { dropDB, get } from './utils/IndexDB/features';
 
 const NotFoundPage = lazy(() => import('./NotFound'));
 function App() {
@@ -25,7 +27,25 @@ function App() {
     }
   }, [userState.user]);
 
-  console.log('online', online);
+  useEffect(() => {
+    dispatch(updateNetWorkStatus(online));
+  }, [online]);
+
+  const getPendingShapeItems = (pending_items) => {
+    if (online && pending_items && pending_items.length > 0) {
+      // eslint-disable-next-line array-callback-return
+      pending_items.map((d) => {
+        const cloneData = { ...d };
+        delete cloneData.isNew; // remove isNew filed
+        dispatch(makeChangesShape({ isNew: d.isNew, data: cloneData }));
+      });
+      dropDB();
+    }
+  };
+
+  useEffect(() => {
+    get(getPendingShapeItems);
+  }, []);
 
   return (
     <Suspense fallback={<NavigationLoader />}>
