@@ -2,15 +2,17 @@
 /* eslint-disable max-len */
 /* eslint-disable max-classes-per-file */
 import React, { useEffect, useState } from 'react';
-import {
-  Stage, Layer,
-} from 'react-konva';
+import { Stage, Layer } from 'react-konva';
 import { useSelector, useDispatch } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import { useParams } from 'react-router-dom';
 import moment from 'moment/moment';
 import {
-  addShape, makeChangesShape, selectShape, fetchProjectDetail, updateSelectShapeValue,
+  addShape,
+  makeChangesShape,
+  selectShape,
+  fetchProjectDetail,
+  updateSelectShapeValue,
 } from '../../../redux/features/shapes/shapeSlice';
 import SideBars from './SideBars';
 import FreeDrawing from './Shapes/FreeDrawing';
@@ -109,7 +111,15 @@ const index = () => {
 
   const responseShapeValue = (value) => {
     const {
-      sx, sy, x, y, color, stroke, tempPoints, isDone = false, name,
+      sx,
+      sy,
+      x,
+      y,
+      color,
+      stroke,
+      tempPoints,
+      isDone = false,
+      name,
     } = value;
     let data = {
       id,
@@ -188,7 +198,8 @@ const index = () => {
       const { x, y } = e.target.getStage().getRelativePointerPosition();
       setStartX(x);
       setStartY(y);
-      const width = 0; const height = 0;
+      const width = 0;
+      const height = 0;
       const name = nameShape(selectShapeType);
       const tempData = {
         id: tempId,
@@ -217,7 +228,14 @@ const index = () => {
       setPoints(tempPoints);
 
       const tempData = {
-        sx: startX, sy: startY, x, y, color: defaultColor, stroke: defaultStrokeColor, tempPoints, name,
+        sx: startX,
+        sy: startY,
+        x,
+        y,
+        color: defaultColor,
+        stroke: defaultStrokeColor,
+        tempPoints,
+        name,
       };
       const data = responseShapeValue(tempData);
       setNewDrawable([data]);
@@ -233,7 +251,15 @@ const index = () => {
       setPoints(tempPoints);
       const name = nameShape(selectShapeType);
       const tempData = {
-        sx: startX, sy: startY, x, y, color: defaultColor, stroke: defaultStrokeColor, tempPoints, isDone: true, name,
+        sx: startX,
+        sy: startY,
+        x,
+        y,
+        color: defaultColor,
+        stroke: defaultStrokeColor,
+        tempPoints,
+        isDone: true,
+        name,
       };
       const data = responseShapeValue(tempData);
 
@@ -265,17 +291,28 @@ const index = () => {
       const temStage = e.target.getStage();
       const oldScale = temStage.scaleX();
       const mousePointTo = {
-        x: temStage.getRelativePointerPosition().x / oldScale - temStage.x() / oldScale,
-        y: temStage.getRelativePointerPosition().y / oldScale - temStage.y() / oldScale,
+        x:
+          temStage.getRelativePointerPosition().x / oldScale -
+          temStage.x() / oldScale,
+        y:
+          temStage.getRelativePointerPosition().y / oldScale -
+          temStage.y() / oldScale,
       };
 
-      const newScale = e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
+      const newScale =
+        e.evt.deltaY < 0 ? oldScale * scaleBy : oldScale / scaleBy;
       setStage({
         scale: newScale,
         x:
-          -(mousePointTo.x - temStage.getRelativePointerPosition().x / newScale) * newScale,
+          -(
+            mousePointTo.x -
+            temStage.getRelativePointerPosition().x / newScale
+          ) * newScale,
         y:
-          -(mousePointTo.y - temStage.getRelativePointerPosition().y / newScale) * newScale,
+          -(
+            mousePointTo.y -
+            temStage.getRelativePointerPosition().y / newScale
+          ) * newScale,
       });
     }
   };
@@ -285,7 +322,12 @@ const index = () => {
   }, []);
 
   return (
-    <SideBars changeSelectShapeTypehandle={changeSelectShapeTypehandle} selectShapeType={selectShapeType} currentItems={shapeItems} setCurrentItems={setShapeItems}>
+    <SideBars
+      changeSelectShapeTypehandle={changeSelectShapeTypehandle}
+      selectShapeType={selectShapeType}
+      currentItems={shapeItems}
+      setCurrentItems={setShapeItems}
+    >
       <Stage
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
@@ -298,9 +340,7 @@ const index = () => {
         width={window.innerWidth * 3}
         height={window.innerHeight * 3}
       >
-        <Layer>
-          {shapeItems.map((item) => renderShape(item))}
-        </Layer>
+        <Layer>{shapeItems.map((item) => renderShape(item))}</Layer>
       </Stage>
     </SideBars>
   );

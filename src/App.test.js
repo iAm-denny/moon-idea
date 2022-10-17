@@ -10,7 +10,7 @@ test('renders learn react link', () => {
       <BrowserRouter>
         <App />
       </BrowserRouter>
-    </Provider>,
+    </Provider>
   );
   const linkElement = screen.getByText('Enhance');
   expect(linkElement).toBeInTheDocument();

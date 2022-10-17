@@ -1,15 +1,5 @@
 import React, { useState } from 'react';
-import {
-  Container, Header, Navbar, Skeleton, createStyles, Box,
-} from '@mantine/core';
-
-const useStyles = createStyles(() => ({
-  appshellRoot: {
-    main: {
-      background: 'rgb(248, 249, 250)',
-    },
-  },
-}));
+import { Container, Header, Navbar, Skeleton, Box } from '@mantine/core';
 
 function NavigationLoader() {
   const [isLoggedIn, setIsLoggedIn] = useState(true);
@@ -29,12 +19,13 @@ function NavigationLoader() {
     }
     return (
       <Header height={70} p="md">
-        <Container style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '100%',
-        }}
+        <Container
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            height: '100%',
+          }}
         >
           <Skeleton height={30} radius="sm" width="30%" />
           <Skeleton height={30} radius="sm" width="30%" />
@@ -44,12 +35,13 @@ function NavigationLoader() {
   }
   return (
     <Header height={60} p="xs">
-      <Container style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        height: '100%',
-      }}
+      <Container
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          height: '100%',
+        }}
       >
         <Skeleton height={30} radius="sm" width="30%" />
         <Skeleton height={30} radius="sm" width="30%" />

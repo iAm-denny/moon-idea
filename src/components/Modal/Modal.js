@@ -23,7 +23,13 @@ const useStyles = createStyles((theme) => ({
 function Modal(props) {
   const { classes } = useStyles();
   const {
-    opened, setopened, children, title = '', size = 'lg', closefun = () => {}, ...others
+    opened,
+    setopened,
+    children,
+    title = '',
+    size = 'lg',
+    closefun = () => {},
+    ...others
   } = props;
 
   return (
@@ -37,7 +43,7 @@ function Modal(props) {
       size={size}
       className={classes.root}
       radius="md"
-    // eslint-disable-next-line react/jsx-props-no-spreading
+      // eslint-disable-next-line react/jsx-props-no-spreading
       {...others}
     >
       {children}

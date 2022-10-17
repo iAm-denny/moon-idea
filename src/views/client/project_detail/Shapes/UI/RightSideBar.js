@@ -1,12 +1,11 @@
 import React from 'react';
-import {
-  Box, ColorInput, Container, ScrollArea, Tabs,
-} from '@mantine/core';
+import { Box, ColorInput, Container, ScrollArea, Tabs } from '@mantine/core';
 import { useSelector, useDispatch } from 'react-redux';
 import { useParams } from 'react-router-dom';
 import Text from '../../../../../components/Typography/Text';
 import {
-  makeChangesShape, updateSelectShapeValue,
+  makeChangesShape,
+  updateSelectShapeValue,
 } from '../../../../../redux/features/shapes/shapeSlice';
 
 function RightSideBar() {
@@ -15,7 +14,11 @@ function RightSideBar() {
   const dispatch = useDispatch();
 
   return (
-    <ScrollArea style={{ height: '100%' }} scrollbarSize={6} scrollHideDelay={0}>
+    <ScrollArea
+      style={{ height: '100%' }}
+      scrollbarSize={6}
+      scrollHideDelay={0}
+    >
       <Tabs>
         <Tabs.List grow>
           <Tabs.Tab value="design">
@@ -26,8 +29,7 @@ function RightSideBar() {
           </Tabs.Tab>
         </Tabs.List>
       </Tabs>
-      {
-        selectShapeValue?.data?.fill && (
+      {selectShapeValue?.data?.fill && (
         <Container>
           <Box my={15}>
             <ColorInput
@@ -37,7 +39,9 @@ function RightSideBar() {
                 dispatch(updateSelectShapeValue({ fill: value }));
               }}
               onChangeEnd={(value) => {
-                dispatch(makeChangesShape({ fill: value, project_id: params.id }));
+                dispatch(
+                  makeChangesShape({ fill: value, project_id: params.id })
+                );
               }}
             />
           </Box>
@@ -49,13 +53,14 @@ function RightSideBar() {
                 dispatch(updateSelectShapeValue({ stroke: value }));
               }}
               onChangeEnd={(value) => {
-                dispatch(makeChangesShape({ stroke: value, project_id: params.id }));
+                dispatch(
+                  makeChangesShape({ stroke: value, project_id: params.id })
+                );
               }}
             />
           </Box>
         </Container>
-        )
-      }
+      )}
     </ScrollArea>
   );
 }

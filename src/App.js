@@ -9,7 +9,10 @@ import NavigationLoader from './components/Loader/LazyLoader/NavigationLoader';
 import Navigation from './components/Navigation/index';
 import routes from './routes';
 import { fetchUserInfo } from './redux/features/user/userSlice';
-import { makeChangesShape, updateNetWorkStatus } from './redux/features/shapes/shapeSlice';
+import {
+  makeChangesShape,
+  updateNetWorkStatus,
+} from './redux/features/shapes/shapeSlice';
 import { dropDB, get } from './utils/IndexDB/features';
 
 const NotFoundPage = lazy(() => import('./NotFound'));
@@ -72,7 +75,6 @@ function App() {
             );
           })}
           <Route path="*" element={<NotFoundPage />} />
-
         </Routes>
       </Navigation>
     </Suspense>

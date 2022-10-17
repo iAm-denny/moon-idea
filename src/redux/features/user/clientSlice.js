@@ -10,9 +10,20 @@ const initialState = {
   loading: false,
 };
 
-export const fetchProjectList = createAsyncThunk('fetchProjectList', (accessToken) => api.get('/client/fetch-project', {}, { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => {
-  console.log('err => ', err);
-}));
+export const fetchProjectList = createAsyncThunk(
+  'fetchProjectList',
+  (accessToken) =>
+    api
+      .get(
+        '/client/fetch-project',
+        {},
+        { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }
+      )
+      .then((result) => result)
+      .catch((err) => {
+        console.log('err => ', err);
+      })
+);
 
 export const clientSlice = createSlice({
   name: 'projects',
@@ -43,8 +54,6 @@ export const clientSlice = createSlice({
     },
   },
 });
-export const {
-  addNewProject,
-} = clientSlice.actions;
+export const { addNewProject } = clientSlice.actions;
 
 export default clientSlice.reducer;
