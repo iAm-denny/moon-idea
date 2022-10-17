@@ -11,26 +11,47 @@ const initialState = {
   isOnline: true,
 };
 
-export const makeChangesShape = createAsyncThunk('makeChangesShape', (data, { getState }) => {
-  const state = getState();
-  const { accessToken } = state.user.user;
-  const { selectShapeValue, isOnline } = state.shape;
-  let sendData = {};
-  if (data.isNew) {
-    sendData = data.data;
-  } else {
-    sendData = selectShapeValue;
+export const makeChangesShape = createAsyncThunk(
+  'makeChangesShape',
+  (data, { getState }) => {
+    const state = getState();
+    const { accessToken } = state.user.user;
+    const { selectShapeValue, isOnline } = state.shape;
+    let sendData = {};
+    if (data.isNew) {
+      sendData = data.data;
+    } else {
+      sendData = selectShapeValue;
+    }
+    if (isOnline) {
+      return api
+        .post('/client/project-shape', JSON.stringify(sendData), {
+          accessToken,
+          rftoken_id: localStorage.getItem('rftoken_id'),
+        })
+        .then((result) => result)
+        .catch((err) => {
+          console.log('err => ', err);
+        });
+    }
+    return add({ isNew: data.isNew, ...sendData });
   }
-  console.log('sendData', sendData);
-  if (isOnline) {
-    return api.post('/client/project-shape', JSON.stringify(sendData), { accessToken, rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => { console.log('err => ', err); });
-  }
-  return add({ isNew: data.isNew, ...sendData });
-});
+);
 
-export const fetchProjectDetail = createAsyncThunk('fetchProjectDetail', (project_id) => api.get('/client/project-shape', { project_id }, { rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => {
-  console.error('err => ', err);
-}));
+export const fetchProjectDetail = createAsyncThunk(
+  'fetchProjectDetail',
+  (project_id) =>
+    api
+      .get(
+        '/client/project-shape',
+        { project_id },
+        { rftoken_id: localStorage.getItem('rftoken_id') }
+      )
+      .then((result) => result)
+      .catch((err) => {
+        console.error('err => ', err);
+      })
+);
 
 export const shapeSlice = createSlice({
   name: 'shapes',

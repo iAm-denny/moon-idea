@@ -8,7 +8,7 @@ function Title(props) {
   const { isSmall } = useResponsive();
 
   return (
-  // eslint-disable-next-line react/jsx-props-no-spreading
+    // eslint-disable-next-line react/jsx-props-no-spreading
     <TitleMantine {...props} order={isSmall ? mobileorder || 6 : order}>
       {children}
     </TitleMantine>
@@ -23,6 +23,6 @@ Title.propTypes = {
 };
 
 Title.defaultProps = {
-//   mobileorder: ,
+  //   mobileorder: ,
 };
 export default Title;

@@ -6,7 +6,9 @@ const useResponsive = () => {
   const isLarge = useMediaQuery('(min-width: 1200px)');
 
   return {
-    isSmall, isMedium, isLarge,
+    isSmall,
+    isMedium,
+    isLarge,
   };
 };
 

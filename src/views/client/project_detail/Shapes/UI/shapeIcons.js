@@ -1,5 +1,10 @@
 import {
-  IconRectangle, IconCircle, IconPencil, IconArrowRight, IconLine, IconPointer,
+  IconRectangle,
+  IconCircle,
+  IconPencil,
+  IconArrowRight,
+  IconLine,
+  IconPointer,
 } from '@tabler/icons';
 
 const iconSize = 16;

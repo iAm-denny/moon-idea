@@ -8,9 +8,18 @@ const initialState = {
   loading: false,
 };
 
-export const fetchUserInfo = createAsyncThunk('/user/fetchInfo', () => api.get('/user/get_user/', {}, { rftoken_id: localStorage.getItem('rftoken_id') }).then((result) => result).catch((err) => {
-  console.log('err => ', err);
-}));
+export const fetchUserInfo = createAsyncThunk('/user/fetchInfo', () =>
+  api
+    .get(
+      '/user/get_user/',
+      {},
+      { rftoken_id: localStorage.getItem('rftoken_id') }
+    )
+    .then((result) => result)
+    .catch((err) => {
+      console.log('err => ', err);
+    })
+);
 
 export const userSlice = createSlice({
   name: 'user',
@@ -42,9 +51,7 @@ export const userSlice = createSlice({
     updateUserProfile: (state, action) => {
       const currentState = current(state);
       const { accessToken, user } = currentState.user;
-      const {
-        created_at, email, role, __v, _id,
-      } = user;
+      const { created_at, email, role, __v, _id } = user;
       return {
         loading: false,
         user: {
@@ -72,8 +79,7 @@ export const userSlice = createSlice({
     },
   },
 });
-export const {
-  addUser, changeAccessToken, logout, updateUserProfile,
-} = userSlice.actions;
+export const { addUser, changeAccessToken, logout, updateUserProfile } =
+  userSlice.actions;
 
 export default userSlice.reducer;

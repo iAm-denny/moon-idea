@@ -14,16 +14,12 @@ root.render(
   <React.StrictMode>
     <Provider store={store}>
       <BrowserRouter>
-        <MantineProvider
-          withGlobalStyles
-          withNormalizeCSS
-          theme={theme}
-        >
+        <MantineProvider withGlobalStyles withNormalizeCSS theme={theme}>
           <App />
         </MantineProvider>
       </BrowserRouter>
     </Provider>
-  </React.StrictMode>,
+  </React.StrictMode>
 );
 
 reportWebVitals();

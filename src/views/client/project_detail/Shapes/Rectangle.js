@@ -6,11 +6,15 @@ function Rectangle(props) {
   const shapeRef = useRef();
   const trRef = useRef();
   const {
-    data, onSelectShape, handleDragEnd, selectShapeType, selectShapeValue, handleTransformEnd,
+    data,
+    onSelectShape,
+    handleDragEnd,
+    selectShapeType,
+    selectShapeValue,
+    handleTransformEnd,
   } = props;
-  const {
-    x, y, width, height, fill, stroke, id, scaleX, scaleY, rotation,
-  } = data.data;
+  const { x, y, width, height, fill, stroke, id, scaleX, scaleY, rotation } =
+    data.data;
 
   useEffect(() => {
     if (selectShapeValue.id === id) {

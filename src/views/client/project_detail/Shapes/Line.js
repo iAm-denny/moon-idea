@@ -6,12 +6,16 @@ function LineShape(props) {
   const shapeRef = useRef();
   const trRef = useRef();
   const {
-    data, onSelectShape, handleDragEnd, selectShapeType, selectShapeValue, handleTransformEnd,
+    data,
+    onSelectShape,
+    handleDragEnd,
+    selectShapeType,
+    selectShapeValue,
+    handleTransformEnd,
   } = props;
 
-  const {
-    fill, stroke, id, points, x, y, scaleX, scaleY, rotation,
-  } = data.data;
+  const { fill, stroke, id, points, x, y, scaleX, scaleY, rotation } =
+    data.data;
 
   useEffect(() => {
     if (selectShapeValue.id === id) {

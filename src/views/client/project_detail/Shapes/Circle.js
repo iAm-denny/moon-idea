@@ -6,11 +6,25 @@ function CircleShape(props) {
   const shapeRef = useRef();
   const trRef = useRef();
   const {
-    data, onSelectShape, handleDragEnd, selectShapeType, selectShapeValue, handleTransformEnd,
+    data,
+    onSelectShape,
+    handleDragEnd,
+    selectShapeType,
+    selectShapeValue,
+    handleTransformEnd,
   } = props;
 
-  const { // eslint-disable-next-line react/prop-types
-    fill, x, y, stroke, id, radius, scaleX, scaleY, rotation,
+  const {
+    // eslint-disable-next-line react/prop-types
+    fill,
+    x,
+    y,
+    stroke,
+    id,
+    radius,
+    scaleX,
+    scaleY,
+    rotation,
   } = data.data;
 
   useEffect(() => {

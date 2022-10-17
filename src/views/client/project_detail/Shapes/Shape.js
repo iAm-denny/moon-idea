@@ -4,4 +4,4 @@ class Shape {
   }
 }
 
-export default (Shape);
+export default Shape;

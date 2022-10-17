@@ -21,23 +21,31 @@ import Text from '../../../components/Typography/Text';
 
 function SideBars(props) {
   const {
-    children, selectShapeType, changeSelectShapeTypehandle, currentItems, setCurrentItems,
+    children,
+    selectShapeType,
+    changeSelectShapeTypehandle,
+    currentItems,
+    setCurrentItems,
   } = props;
   const theme = useMantineTheme();
   const { isSmall } = useResponsive();
   const { makeChangesLoader, shapesItem } = useSelector((state) => state.shape);
   const { fetchingShapesLoader } = useSelector((state) => state.shape);
 
-  const lastItem = shapesItem && shapesItem.length > 0 ? shapesItem[shapesItem.length - 1] : '';
+  const lastItem =
+    shapesItem && shapesItem.length > 0
+      ? shapesItem[shapesItem.length - 1]
+      : '';
   if (fetchingShapesLoader) {
     return (
-      <div style={{
-        height: '80vh',
-        display: 'flex',
-        flexDirection: 'column',
-        justifyContent: 'center',
-        alignItems: 'center',
-      }}
+      <div
+        style={{
+          height: '80vh',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+        }}
       >
         <Loader color="gray" />
         <Text size="md">Please wait a momemt :D</Text>
@@ -45,10 +53,11 @@ function SideBars(props) {
     );
   }
   return (
-    <div style={{
-      overflow: 'hidden',
-      height: '100vh',
-    }}
+    <div
+      style={{
+        overflow: 'hidden',
+        height: '100vh',
+      }}
     >
       <AppShell
         styles={{
@@ -59,48 +68,69 @@ function SideBars(props) {
         }}
         navbarOffsetBreakpoint="sm"
         asideOffsetBreakpoint="sm"
-        navbar={!isSmall && (
-        <Navbar p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
-          <LeftSideBar currentItems={currentItems} setCurrentItems={setCurrentItems} />
-        </Navbar>
-        )}
+        navbar={
+          !isSmall && (
+            <Navbar p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
+              <LeftSideBar
+                currentItems={currentItems}
+                setCurrentItems={setCurrentItems}
+              />
+            </Navbar>
+          )
+        }
         // eslint-disable-next-line react/jsx-props-no-multi-spaces
-        aside={!isSmall && (
-        <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
-          <Aside p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
-            <RightSideBar />
-          </Aside>
-        </MediaQuery>
-        )}
-        header={!isSmall && (
-        <Header height={40} p="md" hiddenbreakpoint="sm">
-          <div style={{
-            display: 'flex', alignItems: 'center', height: '100%', justifyContent: 'space-between',
-          }}
-          >
-            <Tabs value={selectShapeType} onTabChange={(value) => changeSelectShapeTypehandle(value)}>
-              <Tabs.List>
-                {
-                shapeIcons.map((item) => (
-                  <Tooltip label={item.name} position="bottom" withinPortal key={item.name}>
-                    <Tabs.Tab value={item.component} icon={item.icon} />
-                  </Tooltip>
-                ))
-              }
-              </Tabs.List>
-            </Tabs>
-            {
-              makeChangesLoader ? <Text size="sm" color="gray">Saving a file</Text> : lastItem ? (
-                <Text size="sm" color="gray">
-                  Saved a file:
-                  {' '}
-                  {lastItem && moment(lastItem.createdAt).format('DD--MMM-YYYY')}
-                </Text>
-              ) : null
-            }
-          </div>
-        </Header>
-        )}
+        aside={
+          !isSmall && (
+            <MediaQuery smallerThan="sm" styles={{ display: 'none' }}>
+              <Aside p="md" hiddenbreakpoint="sm" width={{ sm: 200, lg: 200 }}>
+                <RightSideBar />
+              </Aside>
+            </MediaQuery>
+          )
+        }
+        header={
+          !isSmall && (
+            <Header height={40} p="md" hiddenbreakpoint="sm">
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: '100%',
+                  justifyContent: 'space-between',
+                }}
+              >
+                <Tabs
+                  value={selectShapeType}
+                  onTabChange={(value) => changeSelectShapeTypehandle(value)}
+                >
+                  <Tabs.List>
+                    {shapeIcons.map((item) => (
+                      <Tooltip
+                        label={item.name}
+                        position="bottom"
+                        withinPortal
+                        key={item.name}
+                      >
+                        <Tabs.Tab value={item.component} icon={item.icon} />
+                      </Tooltip>
+                    ))}
+                  </Tabs.List>
+                </Tabs>
+                {makeChangesLoader ? (
+                  <Text size="sm" color="gray">
+                    Saving a file
+                  </Text>
+                ) : lastItem ? (
+                  <Text size="sm" color="gray">
+                    Saved a file:{' '}
+                    {lastItem &&
+                      moment(lastItem.createdAt).format('DD--MMM-YYYY')}
+                  </Text>
+                ) : null}
+              </div>
+            </Header>
+          )
+        }
       >
         {children}
       </AppShell>
