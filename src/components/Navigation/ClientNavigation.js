@@ -354,7 +354,7 @@ function ClientNavigation(props) {
   const [openForm, setOpenForm] = useState(false);
   const { pathname } = useLocation();
   const navigate = useNavigate();
-  const { isSmall } = useResponsive();
+  const { isSmall, isMedium } = useResponsive();
   const [selectedPath, setSelectedPath] = useState(pathname);
   const [opened, setOpened] = useState(false);
   const { classes } = useStyles();
@@ -411,6 +411,7 @@ function ClientNavigation(props) {
           p="md"
           hiddenbreakpoint="sm"
           hidden={!opened}
+          style={{ display: isMedium && 'flex' }}
         >
           <Center>Logo</Center>
           <Navbar.Section grow mt={50}>

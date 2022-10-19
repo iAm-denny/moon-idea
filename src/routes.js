@@ -7,6 +7,9 @@ const ClientProjectsDetailPage = lazy(() =>
   import('./views/client/project_detail')
 );
 const ClientCommunityPage = lazy(() => import('./views/client/community'));
+const ClientCommunityDetailPage = lazy(() =>
+  import('./views/client/community/Detail')
+);
 
 const routeFunction = () => {
   const userState = useSelector((state) => state.user);
@@ -42,6 +45,13 @@ const routeFunction = () => {
           key: 'MY_PROJECT_DETAIL',
           exact: true,
           component: ClientProjectsDetailPage,
+        },
+        {
+          path: '/community/:id',
+          key: 'COMMUNITY_DETAIL',
+          title: '',
+          exact: true,
+          component: ClientCommunityDetailPage,
         },
       ],
     },
