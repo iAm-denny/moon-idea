@@ -6,10 +6,9 @@ import useResponsive from '../../utils/responsive';
 function Text(props) {
   const { children, size = 'md', mobilesize = 'sm' } = props;
   const { isSmall } = useResponsive();
-
   return (
     // eslint-disable-next-line react/jsx-props-no-spreading
-    <TextManTine {...props} size={isSmall ? mobilesize || 'sm' : size}>
+    <TextManTine {...props} size={isSmall ? mobilesize || 'sm' : size || 'sm'}>
       {children}
     </TextManTine>
   );

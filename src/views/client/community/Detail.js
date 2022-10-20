@@ -81,11 +81,11 @@ function Detail() {
         <Box>
           <Text mb={10}>Answer</Text>
           <ScrollArea style={{ height: '50vh' }}>
-            {[0, 1, 2, 3, 4, 5].map(() => (
-              <>
+            {[0, 1, 2, 3, 4, 5].map((index) => (
+              <div key={index}>
                 <UserCard />
                 <Divider mb={16} />
-              </>
+              </div>
             ))}
           </ScrollArea>
         </Box>

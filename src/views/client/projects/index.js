@@ -42,6 +42,9 @@ const useStyles = createStyles((theme, _params, getRef) => ({
     cursor: 'pointer',
     color: '#000',
     textDecoration: 'none',
+    '&:hover': {
+      background: 'rgba(0, 0, 0, 0.05)',
+    },
   },
   chipBox: {
     width: '100%',
