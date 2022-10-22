@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import {
   Box,
@@ -13,9 +13,14 @@ import { Link } from 'react-router-dom';
 import RichTextEditor from '@mantine/rte';
 import { useForm, yupResolver } from '@mantine/form';
 import * as Yup from 'yup';
+import { IconPlus } from '@tabler/icons';
+import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import Title from '../../../components/Typography/Title';
 import Modal from '../../../components/Modal/Modal';
 import Text from '../../../components/Typography/Text';
+import api from '../../../config/api';
+import { fetchQuestionList } from '../../../redux/features/user/clientSlice';
 
 const useStyles = createStyles((theme) => ({
   item: {
@@ -51,6 +56,13 @@ function Index(props) {
   const questionRef = useRef();
   const [openAskQuestionForm, setOpenAskQuestionForm] = useState(false);
   const [bodyError, setBodyError] = useState('');
+  const userState = useSelector((state) => state.user.user);
+  const { questions, loaderQuestion } = useSelector((state) => state.client);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(fetchQuestionList({ accessToken: userState.accessToken }));
+  }, []);
 
   const handleClickAskQuestionBtn = () => setOpenAskQuestionForm(true);
 
@@ -62,6 +74,7 @@ function Index(props) {
   });
 
   const handlePostQuestion = (value) => {
+    setLoaderPostQuestion(true);
     setBodyError('');
     const removedHTMLElement = questionRef.current.value.replace(
       /<\/?[^>]+(>|$)/g,
@@ -71,11 +84,23 @@ function Index(props) {
     if (removedHTMLElement.length < 3) {
       return setBodyError('Body should have at least 3 letters');
     }
+    const data = {
+      title: value.title,
+      body: questionRef.current.value,
+    };
+    api
+      .post('/client/create-question', JSON.stringify(data), {
+        accessToken: userState.accessToken,
+        rftoken_id: localStorage.getItem('rftoken_id'),
+      })
+      .then((res) => console.log('res', res))
+      .catch((err) => console.log('err', err));
     questionForm.reset();
     setBodyError('');
-    setLoaderPostQuestion(true);
-    return setTimeout(() => setLoaderPostQuestion(false), 3000);
+
+    return setLoaderPostQuestion(false);
   };
+
   return (
     <div>
       <Title order={1}>{title}</Title>
@@ -142,6 +167,7 @@ function Index(props) {
       <Box mt={25}>
         <Group position="right">
           <Button
+            leftIcon={<IconPlus size={16} />}
             mb={15}
             radius="md"
             variant="filled"
@@ -150,21 +176,29 @@ function Index(props) {
             Ask Question
           </Button>
         </Group>
-        <Link to="/client/community/123" className={cx(classes.item)}>
-          <div>
-            <Title order={3}>
-              Is there a way to limit the number of characters in a TextInput
-              component to just 1?
-            </Title>
-            <Text size="sm" mt={8} color="grey">
-              Denny: Hey I cant provider a sandbox, the code is too large but
-              the important part is this:
-            </Text>
-            <Text color="dimmed" size="sm" mt={16}>
-              2h ago
-            </Text>
-          </div>
-        </Link>
+        {!loaderQuestion &&
+          questions?.data &&
+          questions?.data.length > 0 &&
+          questions?.data?.map((question) => (
+            <Link
+              // eslint-disable-next-line no-underscore-dangle
+              to={`/client/community/${question._id}`}
+              className={cx(classes.item)}
+              // eslint-disable-next-line no-underscore-dangle
+              key={question._id}
+            >
+              <div>
+                <Title order={3}>{question.title}</Title>
+                <Text size="sm" mt={8} color="grey">
+                  {question.created_by.fullname}:{' '}
+                  {question.body.replace(/<\/?[^>]+(>|$)/g, '')}
+                </Text>
+                <Text color="dimmed" size="sm" mt={16}>
+                  {moment(question.createdAt).fromNow()}
+                </Text>
+              </div>
+            </Link>
+          ))}
       </Box>
     </div>
   );

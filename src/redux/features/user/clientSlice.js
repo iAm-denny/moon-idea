@@ -7,7 +7,15 @@ const initialState = {
   projects: {
     data: [],
   },
+  questions: {
+    data: [],
+  },
+  answers: {
+    data: [],
+  },
   loading: false,
+  loaderQuestion: false,
+  loaderAnaswer: false,
 };
 
 export const fetchProjectList = createAsyncThunk(
@@ -21,9 +29,46 @@ export const fetchProjectList = createAsyncThunk(
       )
       .then((result) => result)
       .catch((err) => {
-        console.log('err => ', err);
+        console.log('err => -', err);
       })
 );
+
+export const fetchQuestionList = createAsyncThunk(
+  'fetchQuestionList',
+  (params) => {
+    const { accessToken, post_id = '' } = params;
+    return api
+      .get(
+        `/client/fetch-question`,
+        { post_id },
+        {
+          accessToken,
+          rftoken_id: localStorage.getItem('rftoken_id'),
+        }
+      )
+      .then((result) => result)
+      .catch((err) => {
+        console.log('err => ', err);
+      });
+  }
+);
+
+export const fetchAnswerList = createAsyncThunk('fetchAnswerList', (params) => {
+  const { accessToken, post_id } = params;
+  return api
+    .get(
+      `/client/fetch-answer`,
+      { post_id },
+      {
+        accessToken,
+        rftoken_id: localStorage.getItem('rftoken_id'),
+      }
+    )
+    .then((result) => result)
+    .catch((err) => {
+      console.log('err => ', err);
+    });
+});
 
 export const clientSlice = createSlice({
   name: 'projects',
@@ -43,6 +88,38 @@ export const clientSlice = createSlice({
     });
     builder.addCase(fetchProjectList.rejected, (state) => {
       state.loading = false;
+    });
+    // fetch question
+    builder.addCase(fetchQuestionList.pending, (state) => {
+      state.loaderQuestion = true;
+    });
+    builder.addCase(fetchQuestionList.fulfilled, (state, action) => {
+      if (action.payload === 'Session timeout' && !action.payload.success) {
+        localStorage.removeItem('rftoken_id');
+        state.questions = {};
+      } else {
+        state.questions = action.payload;
+      }
+      state.loaderQuestion = false;
+    });
+    builder.addCase(fetchQuestionList.rejected, (state) => {
+      state.loaderQuestion = false;
+    });
+    // fetch answer
+    builder.addCase(fetchAnswerList.pending, (state) => {
+      state.loaderAnaswer = true;
+    });
+    builder.addCase(fetchAnswerList.fulfilled, (state, action) => {
+      if (action.payload === 'Session timeout' && !action.payload.success) {
+        localStorage.removeItem('rftoken_id');
+        state.answers = {};
+      } else {
+        state.answers = action.payload;
+      }
+      state.loaderAnaswer = false;
+    });
+    builder.addCase(fetchAnswerList.rejected, (state) => {
+      state.loaderAnaswer = false;
     });
   },
   reducers: {

@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Avatar,
   Box,
@@ -6,10 +7,18 @@ import {
   Divider,
   ScrollArea,
 } from '@mantine/core';
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { RichTextEditor } from '@mantine/rte';
+import { useParams } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import moment from 'moment';
 import Text from '../../../components/Typography/Text';
 import Title from '../../../components/Typography/Title';
+import {
+  fetchAnswerList,
+  fetchQuestionList,
+} from '../../../redux/features/user/clientSlice';
+import api from '../../../config/api';
 
 const useStyles = createStyles(() => ({
   user: {
@@ -22,36 +31,38 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-function UserCard() {
+function UserCard(dataprops = {}) {
   const { classes } = useStyles();
+  const { data } = dataprops;
+
   return (
     <Box className={classes.user} mb={20}>
       {/* Profile */}
       <Box mr={16}>
-        <Avatar radius="xl" size="md" color="cyan">
-          D
-        </Avatar>
+        {data?.created_by?.profile ? (
+          <Avatar radius="xl" size="md" src={data?.created_by?.profile} />
+        ) : (
+          <Avatar radius="xl" size="md" color="cyan">
+            {data?.created_by?.fullname[0]}
+          </Avatar>
+        )}
       </Box>
       {/* info */}
       <div>
         <div className={classes.user_info}>
           <Text mr={8} weight="bold" size="sm">
-            Denny
+            {data?.created_by?.fullname}
           </Text>
           <Text size="xs" color="grey">
-            Today at 11:04 AM
+            {moment(data.createdAt).format('DD MMMM YYYY')}
           </Text>
         </div>
         <Box mt={8}>
-          <Text size="sm">
-            Howdy! Ughhh I have kind of a dumb CSS question. Check this code:
-            https://codesandbox.io/s/relaxed-dan-6pkvbw?file=/src/App.tsx I like
-            how it works below 1000px, but once it goes above that I want the
-            card to center instead of sticking to the right. Basically how
-            Mantine.Dev site works when you go above 1200px (i think), it
-            centers the content, but below that it fits snug in the window.
-            Whats the trick?! Thanks,{' '}
-          </Text>
+          {data?.content ? (
+            <Text size="sm" dangerHTML text={data?.content} />
+          ) : (
+            data?.body && <Text size="sm" dangerHTML text={data?.body} />
+          )}
         </Box>
       </div>
     </Box>
@@ -60,47 +71,100 @@ function UserCard() {
 
 function Detail() {
   const answerRef = useRef();
+  const [ownerPostId, setOwnerPostId] = useState(null);
+  const params = useParams();
+  const userState = useSelector((state) => state.user.user);
+  const dispatch = useDispatch();
+  const { questions, loaderQuestion, answers } = useSelector(
+    (state) => state.client
+  );
+
+  useEffect(() => {
+    dispatch(
+      fetchQuestionList({
+        accessToken: userState.accessToken,
+        post_id: params.id,
+      })
+    );
+
+    dispatch(
+      fetchAnswerList({
+        accessToken: userState.accessToken,
+        post_id: params.id,
+      })
+    );
+  }, []);
 
   const handlePostAnswer = () => {
-    console.log('answerRef', answerRef.current.value);
+    const data = {
+      content: answerRef.current.value,
+      post_id: params.id,
+      post_owner_id: ownerPostId,
+    };
+    api
+      .post('/client/create-answer', JSON.stringify(data), {
+        accessToken: userState.accessToken,
+        rftoken_id: localStorage.getItem('rftoken_id'),
+      })
+      .then((res) => {
+        console.log('res', res);
+        dispatch(
+          fetchAnswerList({
+            accessToken: userState.accessToken,
+            post_id: params.id,
+          })
+        );
+      })
+      .catch((err) => console.log('err', err));
+    const textEdiotrVal = document.querySelector('.ql-editor p');
+    textEdiotrVal.remove();
+    answerRef.current.value = '';
   };
+
+  useEffect(() => {
+    // eslint-disable-next-line no-underscore-dangle
+    setOwnerPostId(questions?.data?.created_by?._id);
+  }, [questions]);
+
+  console.log('ownerPostId', ownerPostId);
+
+  console.log('questions', questions);
   return (
     <div>
-      <Title order={1}>
-        {' '}
-        Is there a way to limit the number of characters in a TextInput
-        component to just 1?
-      </Title>
+      <Title order={1}> {questions.data.title}</Title>
 
       <Box mt={25}>
         {/* questioner  */}
-        <UserCard />
+        {!loaderQuestion && <UserCard data={questions.data} />}
+
         <Divider my={16} mb={25} />
         {/* end questioner  */}
-
-        <Box>
-          <Text mb={10}>Answer</Text>
-          <ScrollArea style={{ height: '50vh' }}>
-            {[0, 1, 2, 3, 4, 5].map((index) => (
-              <div key={index}>
-                <UserCard />
-                <Divider mb={16} />
-              </div>
-            ))}
-          </ScrollArea>
-        </Box>
-
+        {answers && answers.data.length > 0 && (
+          <Box>
+            <Text mb={10}>Answer</Text>
+            <ScrollArea style={{ height: '50vh' }}>
+              {answers.data.map((data) => (
+                // eslint-disable-next-line no-underscore-dangle
+                <div key={data._id}>
+                  <UserCard data={data} />
+                  <Divider mb={16} />
+                </div>
+              ))}
+            </ScrollArea>
+          </Box>
+        )}
         <Box mt={35}>
           <Text mb={10}>Your answer</Text>
           <RichTextEditor
             ref={answerRef}
-            id="rte"
+            id="answer-text-editor"
             controls={[
               ['bold', 'italic', 'underline', 'link'],
               ['unorderedList'],
               ['sup', 'sub'],
               ['alignLeft', 'alignCenter', 'alignRight'],
             ]}
+            value={answerRef?.current?.value}
           />
         </Box>
         <Button mt={15} radius="md" variant="filled" onClick={handlePostAnswer}>

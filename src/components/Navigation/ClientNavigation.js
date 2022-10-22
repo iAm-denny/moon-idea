@@ -32,6 +32,7 @@ import {
   IconLogout,
   IconUserCircle,
   IconPhoto,
+  IconBell,
 } from '@tabler/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -88,6 +89,7 @@ const useStyles = createStyles((theme) => ({
 const mockdata = [
   { icon: IconFolder, label: 'Home', path: '/client/my-projects' },
   { icon: IconUsers, label: 'Community', path: '/client/community' },
+  { icon: IconBell, label: 'Notification', path: '/client/notification' },
 ];
 
 function NavbarLink({ icon: Icon, label, active, onClick }) {

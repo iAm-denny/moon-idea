@@ -10,6 +10,9 @@ const ClientCommunityPage = lazy(() => import('./views/client/community'));
 const ClientCommunityDetailPage = lazy(() =>
   import('./views/client/community/Detail')
 );
+const ClientNotificationPage = lazy(() =>
+  import('./views/client/notification')
+);
 
 const routeFunction = () => {
   const userState = useSelector((state) => state.user);
@@ -52,6 +55,13 @@ const routeFunction = () => {
           title: '',
           exact: true,
           component: ClientCommunityDetailPage,
+        },
+        {
+          path: '/notification/',
+          key: 'NOTIFICATION',
+          title: '',
+          exact: true,
+          component: ClientNotificationPage,
         },
       ],
     },

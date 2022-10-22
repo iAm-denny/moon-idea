@@ -121,6 +121,7 @@ function Index(props) {
   useEffect(() => {
     dispatch(fetchProjectList(userState.accessToken));
   }, []);
+
   const handleClickCreateBtn = () => setOpenCreateProjectForm(true);
 
   const createProject = (values) => {
