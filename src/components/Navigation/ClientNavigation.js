@@ -32,6 +32,7 @@ import {
   IconLogout,
   IconUserCircle,
   IconPhoto,
+  IconBell,
 } from '@tabler/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -88,6 +89,7 @@ const useStyles = createStyles((theme) => ({
 const mockdata = [
   { icon: IconFolder, label: 'Home', path: '/client/my-projects' },
   { icon: IconUsers, label: 'Community', path: '/client/community' },
+  { icon: IconBell, label: 'Notification', path: '/client/notification' },
 ];
 
 function NavbarLink({ icon: Icon, label, active, onClick }) {
@@ -373,6 +375,12 @@ function ClientNavigation(props) {
   ));
 
   useEffect(() => {
+    if (pathname.includes('/client/community')) {
+      setSelectedPath('/client/community');
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     setOpened(false);
   }, [isSmall]);
 
@@ -439,9 +447,15 @@ function ClientNavigation(props) {
       <Modal opened={openForm} setopened={setOpenForm} title="Profile">
         <ProfileContent />
       </Modal>
-      <Paper shadow="xs" p="lg" radius="md" className={classes.childrenRoot}>
-        {children}
-      </Paper>
+      {pathname === '/client/notification' ? (
+        <Box p="lg" className={classes.childrenRoot}>
+          {children}
+        </Box>
+      ) : (
+        <Paper shadow="xs" p="lg" radius="md" className={classes.childrenRoot}>
+          {children}
+        </Paper>
+      )}
     </AppShell>
   );
 }
