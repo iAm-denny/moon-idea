@@ -375,6 +375,12 @@ function ClientNavigation(props) {
   ));
 
   useEffect(() => {
+    if (pathname.includes('/client/community')) {
+      setSelectedPath('/client/community');
+    }
+  }, [pathname]);
+
+  useEffect(() => {
     setOpened(false);
   }, [isSmall]);
 
@@ -441,9 +447,15 @@ function ClientNavigation(props) {
       <Modal opened={openForm} setopened={setOpenForm} title="Profile">
         <ProfileContent />
       </Modal>
-      <Paper shadow="xs" p="lg" radius="md" className={classes.childrenRoot}>
-        {children}
-      </Paper>
+      {pathname === '/client/notification' ? (
+        <Box p="lg" className={classes.childrenRoot}>
+          {children}
+        </Box>
+      ) : (
+        <Paper shadow="xs" p="lg" radius="md" className={classes.childrenRoot}>
+          {children}
+        </Paper>
+      )}
     </AppShell>
   );
 }

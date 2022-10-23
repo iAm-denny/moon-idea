@@ -13,9 +13,13 @@ const initialState = {
   answers: {
     data: [],
   },
+  notification: {
+    data: [],
+  },
   loading: false,
   loaderQuestion: false,
   loaderAnaswer: false,
+  loaderNotification: true,
 };
 
 export const fetchProjectList = createAsyncThunk(
@@ -70,6 +74,39 @@ export const fetchAnswerList = createAsyncThunk('fetchAnswerList', (params) => {
     });
 });
 
+export const fetchNotificationList = createAsyncThunk(
+  'fetchNotificationList',
+  (params) => {
+    const { accessToken } = params;
+    return api
+      .get(
+        `/client/fetch-notification`,
+        {},
+        {
+          accessToken,
+          rftoken_id: localStorage.getItem('rftoken_id'),
+        }
+      )
+      .then((result) => {
+        api
+          .post('/client/read-notification', JSON.stringify({}), {
+            accessToken,
+            rftoken_id: localStorage.getItem('rftoken_id'),
+          })
+          .then((res) => {
+            console.log('res', res);
+          })
+          .catch((err) => {
+            console.log('err', err);
+          });
+        return result;
+      })
+      .catch((err) => {
+        console.log('err => ', err);
+      });
+  }
+);
+
 export const clientSlice = createSlice({
   name: 'projects',
   initialState,
@@ -120,6 +157,22 @@ export const clientSlice = createSlice({
     });
     builder.addCase(fetchAnswerList.rejected, (state) => {
       state.loaderAnaswer = false;
+    });
+    // fetch notification
+    builder.addCase(fetchNotificationList.pending, (state) => {
+      state.loaderNotification = true;
+    });
+    builder.addCase(fetchNotificationList.fulfilled, (state, action) => {
+      if (action.payload === 'Session timeout' && !action.payload.success) {
+        localStorage.removeItem('rftoken_id');
+        state.notification = {};
+      } else {
+        state.notification = action.payload;
+      }
+      state.loaderNotification = false;
+    });
+    builder.addCase(fetchNotificationList.rejected, (state) => {
+      state.loaderNotification = false;
     });
   },
   reducers: {

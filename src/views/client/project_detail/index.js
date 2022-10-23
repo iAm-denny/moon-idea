@@ -262,14 +262,13 @@ const index = () => {
         name,
       };
       const data = responseShapeValue(tempData);
-      console.log('data', data);
       if (data?.data?.type === 'CircleShape' && data?.data?.radius !== 0) {
         dispatch(addShape(data));
         onSelectShape(data);
         dispatch(selectShape(data));
         dispatch(makeChangesShape({ isNew: true, data }));
       } else if (
-        data?.data?.type === '"RectangleShape"' &&
+        data?.data?.type === 'RectangleShape' &&
         data?.data?.width !== 0 &&
         data?.data?.height !== 0
       ) {

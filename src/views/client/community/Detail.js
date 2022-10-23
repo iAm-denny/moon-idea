@@ -71,7 +71,7 @@ function UserCard(dataprops = {}) {
 
 function Detail() {
   const answerRef = useRef();
-  const [ownerPostId, setOwnerPostId] = useState(null);
+  const [ownerCreatorId, setOwnerCreatorId] = useState(null);
   const params = useParams();
   const userState = useSelector((state) => state.user.user);
   const dispatch = useDispatch();
@@ -99,7 +99,7 @@ function Detail() {
     const data = {
       content: answerRef.current.value,
       post_id: params.id,
-      post_owner_id: ownerPostId,
+      post_owner_id: ownerCreatorId,
     };
     api
       .post('/client/create-answer', JSON.stringify(data), {
@@ -107,7 +107,6 @@ function Detail() {
         rftoken_id: localStorage.getItem('rftoken_id'),
       })
       .then((res) => {
-        console.log('res', res);
         dispatch(
           fetchAnswerList({
             accessToken: userState.accessToken,
@@ -123,12 +122,9 @@ function Detail() {
 
   useEffect(() => {
     // eslint-disable-next-line no-underscore-dangle
-    setOwnerPostId(questions?.data?.created_by?._id);
+    setOwnerCreatorId(questions?.data?.created_by?._id);
   }, [questions]);
 
-  console.log('ownerPostId', ownerPostId);
-
-  console.log('questions', questions);
   return (
     <div>
       <Title order={1}> {questions.data.title}</Title>

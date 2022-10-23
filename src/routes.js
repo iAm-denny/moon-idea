@@ -59,7 +59,7 @@ const routeFunction = () => {
         {
           path: '/notification/',
           key: 'NOTIFICATION',
-          title: '',
+          title: 'Notification',
           exact: true,
           component: ClientNotificationPage,
         },

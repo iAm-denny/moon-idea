@@ -36,6 +36,8 @@ const useStyles = createStyles((theme) => ({
     marginBottom: theme.spacing.sm,
     cursor: 'pointer',
     color: '#000',
+    height: 150,
+    overflow: 'hidden',
     textDecoration: 'none',
     '&:hover': {
       background: 'rgba(0, 0, 0, 0.05)',
@@ -189,10 +191,23 @@ function Index(props) {
             >
               <div>
                 <Title order={3}>{question.title}</Title>
-                <Text size="sm" mt={8} color="grey">
-                  {question.created_by.fullname}:{' '}
-                  {question.body.replace(/<\/?[^>]+(>|$)/g, '')}
-                </Text>
+                <div>
+                  <Text
+                    size="sm"
+                    mt={8}
+                    color="grey"
+                    style={{
+                      width: '85vw',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    {question.created_by.fullname}:{' '}
+                    {question.body.replace(/<\/?[^>]+(>|$)/g, '')}
+                  </Text>
+                </div>
+
                 <Text color="dimmed" size="sm" mt={16}>
                   {moment(question.createdAt).fromNow()}
                 </Text>
