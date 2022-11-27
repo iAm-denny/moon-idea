@@ -93,9 +93,7 @@ export const fetchNotificationList = createAsyncThunk(
             accessToken,
             rftoken_id: localStorage.getItem('rftoken_id'),
           })
-          .then((res) => {
-            console.log('res', res);
-          })
+          .then((res) => {})
           .catch((err) => {
             console.log('err', err);
           });
