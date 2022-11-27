@@ -98,6 +98,9 @@ function Index(props) {
       .then((res) => console.log('res', res))
       .catch((err) => console.log('err', err));
     questionForm.reset();
+    const textEdiotrVal = document.querySelector('.ql-editor p');
+    textEdiotrVal.remove();
+    setOpenAskQuestionForm(false);
     setBodyError('');
 
     return setLoaderPostQuestion(false);
@@ -112,6 +115,7 @@ function Index(props) {
         title="Ask Question"
         closefun={() => {
           // questionRef = null;
+          questionForm.reset();
           setBodyError('');
           questionRef.current.value = '';
         }}

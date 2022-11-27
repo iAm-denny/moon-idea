@@ -54,7 +54,7 @@ function UserCard(dataprops = {}) {
             {data?.created_by?.fullname}
           </Text>
           <Text size="xs" color="grey">
-            {moment(data.createdAt).format('DD MMMM YYYY')}
+            {moment(data?.createdAt).format('DD MMMM YYYY | HH:MM')}
           </Text>
         </div>
         <Box mt={8}>
@@ -127,7 +127,7 @@ function Detail() {
 
   return (
     <div>
-      <Title order={1}> {questions.data.title}</Title>
+      <Title order={1}> {questions?.data?.title}</Title>
 
       <Box mt={25}>
         {/* questioner  */}
@@ -138,7 +138,7 @@ function Detail() {
         {answers && answers.data.length > 0 && (
           <Box>
             <Text mb={10}>Answer</Text>
-            <ScrollArea style={{ height: '50vh' }}>
+            <ScrollArea style={{ height: answers.data.length > 3 && '50vh' }}>
               {answers.data.map((data) => (
                 // eslint-disable-next-line no-underscore-dangle
                 <div key={data._id}>

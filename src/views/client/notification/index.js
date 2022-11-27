@@ -77,7 +77,9 @@ function index(props) {
           notification.data.map((data, i) => (
             <Link
               // eslint-disable-next-line no-underscore-dangle
-              to={`/client/community/${data.post_id}`}
+              key={data._id}
+              // eslint-disable-next-line no-underscore-dangle
+              to={`/client/community/${data.post_id._id}`}
               className={cx(classes.item, { [classes.active]: !data.has_read })}
               // eslint-disable-next-line no-underscore-dangle
             >
@@ -105,7 +107,7 @@ function index(props) {
                       <Text>{convertText(data.noti_type)} </Text>
                     </div>
                     <Text size="sm" color="grey">
-                      This is title
+                      {data?.post_id?.title}
                     </Text>
                   </Box>
                 </Group>
