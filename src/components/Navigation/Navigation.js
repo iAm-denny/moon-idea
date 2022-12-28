@@ -356,14 +356,16 @@ function LoginContent({ setSwitchForm }) {
         localStorage.setItem('rftoken_id', res.rftoken_id);
         dispatch(addUser(res));
         setLoader(false);
-        if (!res.success)
+        if (!res.success) {
           setErrorMessage(
             'You have entered an incorrect email or password. Please note that both fields are case-sensitive'
           );
-        setErrorMessage(null);
+        } else {
+          setErrorMessage(null);
+        }
       })
       .catch(() => {
-        setErrorMessage('Something went wring.');
+        setErrorMessage('Something went wrong.');
         setLoader(false);
       });
   };

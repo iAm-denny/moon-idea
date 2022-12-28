@@ -419,7 +419,7 @@ function ClientNavigation(props) {
           p="md"
           hiddenbreakpoint="sm"
           hidden={!opened}
-          style={{ display: isMedium && 'flex' }}
+          style={{ display: isMedium && 'flex', top: 0 }}
         >
           <Center>Logo</Center>
           <Navbar.Section grow mt={50}>
