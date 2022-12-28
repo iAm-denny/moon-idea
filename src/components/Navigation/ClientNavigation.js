@@ -48,6 +48,7 @@ const useStyles = createStyles((theme) => ({
   appshellRoot: {
     main: {
       background: 'rgb(248, 249, 250)',
+      paddingTop: 16,
     },
   },
   childrenRoot: {
