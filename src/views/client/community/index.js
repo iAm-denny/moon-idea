@@ -54,6 +54,7 @@ const questionSchema = Yup.object().shape({
 function Index(props) {
   const { title } = props;
   const [loaderPostQuestion, setLoaderPostQuestion] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
   const { classes, cx } = useStyles();
   const questionRef = useRef();
   const [openAskQuestionForm, setOpenAskQuestionForm] = useState(false);
@@ -95,13 +96,20 @@ function Index(props) {
         accessToken: userState.accessToken,
         rftoken_id: localStorage.getItem('rftoken_id'),
       })
-      .then((res) => console.log('res', res))
+      .then((res) => {
+        if (res.success) {
+          dispatch(fetchQuestionList({ accessToken: userState.accessToken }));
+          setErrorMessage(null);
+          questionForm.reset();
+          const textEdiotrVal = document.querySelector('.ql-editor p');
+          textEdiotrVal.remove();
+          setOpenAskQuestionForm(false);
+          setBodyError('');
+        } else {
+          setErrorMessage('Something went wrong.');
+        }
+      })
       .catch((err) => console.log('err', err));
-    questionForm.reset();
-    const textEdiotrVal = document.querySelector('.ql-editor p');
-    textEdiotrVal.remove();
-    setOpenAskQuestionForm(false);
-    setBodyError('');
 
     return setLoaderPostQuestion(false);
   };
@@ -109,6 +117,7 @@ function Index(props) {
   return (
     <div>
       <Title order={1}>{title}</Title>
+
       <Modal
         opened={openAskQuestionForm}
         setopened={setOpenAskQuestionForm}
@@ -124,6 +133,23 @@ function Index(props) {
           onSubmit={questionForm.onSubmit(handlePostQuestion)}
           autoComplete="chrome-off"
         >
+          {errorMessage && (
+            <Box
+              sx={(theme) => ({
+                backgroundColor: theme.colors.red[0],
+                color: theme.colors.red,
+                borderWidth: 1,
+                borderStyle: 'solid',
+                borderColor: theme.colors.red[5],
+                textAlign: 'center',
+                padding: theme.spacing.xs,
+                borderRadius: theme.radius.md,
+              })}
+            >
+              <Text size="sm">{errorMessage}</Text>
+            </Box>
+          )}
+
           <TextInput
             label="Title"
             size="sm"
