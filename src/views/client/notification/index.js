@@ -67,57 +67,62 @@ function index(props) {
     }
     return text;
   };
-
   return (
     <div>
       <Title order={1}>{title}</Title>
       <Box mt={25}>
         {notification &&
           notification.data &&
-          notification.data.map((data, i) => (
-            <Link
-              // eslint-disable-next-line no-underscore-dangle
-              key={data._id}
-              // eslint-disable-next-line no-underscore-dangle
-              to={`/client/community/${data.post_id._id}`}
-              className={cx(classes.item, { [classes.active]: !data.has_read })}
-              // eslint-disable-next-line no-underscore-dangle
-            >
-              <div>
-                <Group position="left">
-                  {data?.sender_id?.profile ? (
-                    <Avatar
-                      radius="xl"
-                      size="md"
-                      src={data?.sender_id?.profile}
-                    />
-                  ) : (
-                    <Avatar radius="xl" size="md" color="cyan">
-                      {data?.sender_id?.fullname[0]}
-                    </Avatar>
-                  )}
-                  {/* <Avatar radius="xl" size="md" color="cyan">
+          notification.data.length > 0 &&
+          notification.data.map(
+            (data, i) =>
+              data.post_id && (
+                <Link
+                  // eslint-disable-next-line no-underscore-dangle
+                  key={data._id}
+                  // eslint-disable-next-line no-underscore-dangle
+                  to={`/client/community/${data.post_id._id}`}
+                  className={cx(classes.item, {
+                    [classes.active]: !data.has_read,
+                  })}
+                  // eslint-disable-next-line no-underscore-dangle
+                >
+                  <div>
+                    <Group position="left">
+                      {data?.sender_id?.profile ? (
+                        <Avatar
+                          radius="xl"
+                          size="md"
+                          src={data?.sender_id?.profile}
+                        />
+                      ) : (
+                        <Avatar radius="xl" size="md" color="cyan">
+                          {data?.sender_id?.fullname[0]}
+                        </Avatar>
+                      )}
+                      {/* <Avatar radius="xl" size="md" color="cyan">
                     D
                   </Avatar> */}
-                  <Box>
-                    <div style={{ display: 'flex' }}>
-                      <Text weight="bold" mr={5}>
-                        {data?.sender_id?.fullname}
-                      </Text>
-                      <Text>{convertText(data.noti_type)} </Text>
-                    </div>
-                    <Text size="sm" color="grey">
-                      {data?.post_id?.title}
-                    </Text>
-                  </Box>
-                </Group>
+                      <Box>
+                        <div style={{ display: 'flex' }}>
+                          <Text weight="bold" mr={5}>
+                            {data?.sender_id?.fullname}
+                          </Text>
+                          <Text>{convertText(data.noti_type)} </Text>
+                        </div>
+                        <Text size="sm" color="grey">
+                          {data?.post_id?.title}
+                        </Text>
+                      </Box>
+                    </Group>
 
-                <Text color="dimmed" size="sm" mt={16} ml={6}>
-                  {moment(data.createdAt).fromNow()}
-                </Text>
-              </div>
-            </Link>
-          ))}
+                    <Text color="dimmed" size="sm" mt={16} ml={6}>
+                      {moment(data.createdAt).fromNow()}
+                    </Text>
+                  </div>
+                </Link>
+              )
+          )}
       </Box>
     </div>
   );

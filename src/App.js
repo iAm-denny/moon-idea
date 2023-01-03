@@ -5,6 +5,7 @@ import { Route, Routes } from 'react-router-dom';
 import './App.css';
 import { useSelector, useDispatch } from 'react-redux';
 import { useNetwork } from '@mantine/hooks';
+import ReactGA from 'react-ga';
 import NavigationLoader from './components/Loader/LazyLoader/NavigationLoader';
 import Navigation from './components/Navigation/index';
 import routes from './routes';
@@ -16,12 +17,17 @@ import {
 import { dropDB, get } from './utils/IndexDB/features';
 
 const NotFoundPage = lazy(() => import('./NotFound'));
+
 function App() {
   const { online } = useNetwork();
   const userState = useSelector((state) => state.user);
   const dispatch = useDispatch();
+
   useEffect(() => {
     dispatch(fetchUserInfo());
+    ReactGA.initialize(process.env.REACT_APP_TRACKING_ID);
+    // ReactGA.pageview('/')
+    ReactGA.pageview(window.location.pathname + window.location.search);
   }, []);
 
   useEffect(() => {
