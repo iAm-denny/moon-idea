@@ -12,6 +12,7 @@ import { RichTextEditor } from '@mantine/rte';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { Helmet } from 'react-helmet';
 import Text from '../../../components/Typography/Text';
 import Title from '../../../components/Typography/Title';
 import {
@@ -124,11 +125,18 @@ function Detail() {
     // eslint-disable-next-line no-underscore-dangle
     setOwnerCreatorId(questions?.data?.created_by?._id);
   }, [questions]);
-
   return (
     <div>
       <Title order={1}> {questions?.data?.title}</Title>
-
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>{questions.data.title ? `${questions.data.title}` : ''}</title>
+        <link
+          rel="canonical"
+          // eslint-disable-next-line no-underscore-dangle
+          href={`/client/community/${questions.data._id}`}
+        />
+      </Helmet>
       <Box mt={25}>
         {/* questioner  */}
         {!loaderQuestion && <UserCard data={questions.data} />}

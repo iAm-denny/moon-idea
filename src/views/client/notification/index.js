@@ -3,6 +3,7 @@ import { Avatar, Box, createStyles, Group } from '@mantine/core';
 import { Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { Helmet } from 'react-helmet';
 import Text from '../../../components/Typography/Text';
 import Title from '../../../components/Typography/Title';
 import { fetchNotificationList } from '../../../redux/features/user/clientSlice';
@@ -70,6 +71,11 @@ function index(props) {
   return (
     <div>
       <Title order={1}>{title}</Title>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Notification</title>
+        <link rel="canonical" href="/client/notification" />
+      </Helmet>
       <Box mt={25}>
         {notification &&
           notification.data &&

@@ -9,6 +9,7 @@ const initialState = {
   makeChangesLoader: false,
   fetchingShapesLoader: false,
   isOnline: true,
+  project_detail: {},
 };
 
 export const makeChangesShape = createAsyncThunk(
@@ -74,6 +75,7 @@ export const shapeSlice = createSlice({
       state.fetchingShapesLoader = false;
       if (action.payload.success) {
         state.shapesItem = action.payload.data;
+        state.project_detail = action.payload.project;
       }
     });
     builder.addCase(fetchProjectDetail.rejected, (state) => {
