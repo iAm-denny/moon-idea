@@ -1,4 +1,0 @@
-https://moon-idea.vercel.app/
-https://moon-idea.vercel.app/client/my-projects
-https://moon-idea.vercel.app/client/community
-https://moon-idea.vercel.app/client/notification
