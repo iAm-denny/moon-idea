@@ -17,6 +17,7 @@ import { useForm, yupResolver } from '@mantine/form';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
 import { Link } from 'react-router-dom';
+import { Helmet } from 'react-helmet';
 import Title from '../../../components/Typography/Title';
 import Text from '../../../components/Typography/Text';
 import Modal from '../../../components/Modal/Modal';
@@ -147,6 +148,11 @@ function Index(props) {
   return (
     <div>
       <Title order={1}>{title}</Title>
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>My Projects</title>
+        <link rel="canonical" href="/client/my-projects" />
+      </Helmet>
       <Modal
         opened={openCreateProjectForm}
         setopened={setOpenCreateProjectForm}

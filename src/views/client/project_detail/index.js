@@ -7,6 +7,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { v4 as uuid } from 'uuid';
 import { useParams } from 'react-router-dom';
 import moment from 'moment/moment';
+import { Helmet } from 'react-helmet';
 import {
   addShape,
   makeChangesShape,
@@ -336,6 +337,16 @@ const index = () => {
       currentItems={shapeItems}
       setCurrentItems={setShapeItems}
     >
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>
+          {shapeState.project_detail.project_name
+            ? `${shapeState.project_detail.project_name} -
+            ${shapeState.project_detail.project_type}`
+            : ''}
+        </title>
+        <link rel="canonical" href={`/client/my-projects/${params.id}`} />
+      </Helmet>
       <Stage
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}

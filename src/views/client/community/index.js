@@ -16,6 +16,7 @@ import * as Yup from 'yup';
 import { IconPlus } from '@tabler/icons';
 import { useDispatch, useSelector } from 'react-redux';
 import moment from 'moment';
+import { Helmet } from 'react-helmet';
 import Title from '../../../components/Typography/Title';
 import Modal from '../../../components/Modal/Modal';
 import Text from '../../../components/Typography/Text';
@@ -117,7 +118,11 @@ function Index(props) {
   return (
     <div>
       <Title order={1}>{title}</Title>
-
+      <Helmet>
+        <meta charSet="utf-8" />
+        <title>Community</title>
+        <link rel="canonical" href="/client/community" />
+      </Helmet>
       <Modal
         opened={openAskQuestionForm}
         setopened={setOpenAskQuestionForm}
